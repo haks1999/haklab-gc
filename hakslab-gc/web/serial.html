@@ -7,12 +7,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Starter Template for Bootstrap</title>
+    <title>Serial &amp; Throughput Garbage Collection</title>
 
-    <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.css" rel="stylesheet">
-
-    <!-- Add custom CSS here -->
     <link href="css/full-slider.css" rel="stylesheet">
     
     <style type="text/css">
@@ -81,6 +78,25 @@
    		footer{
    			padding-top: 40px;padding-bottom: 40px;margin-top: 100px;color: #777;text-align: center;border-top: 1px solid #e5e5e5;
    		}
+   	
+   	.bs-callout+.bs-callout {
+margin-top: -5px;
+}
+
+	
+   		.bs-callout-info {
+border-left-color: #5bc0de;
+}
+.bs-callout {
+padding: 20px;
+margin: 20px 0;
+border: 1px solid #eee;
+border-left-width: 5px;
+border-radius: 3px;
+}
+
+
+
     </style>
 
 </head>
@@ -100,7 +116,6 @@
                 <a class="navbar-brand" href="index.php">Start Bootstrap</a>
             </div>
 
-            <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="#about">About</a>
@@ -111,13 +126,10 @@
                     </li>
                 </ul>
             </div>
-            <!-- /.navbar-collapse -->
         </div>
-        <!-- /.container -->
     </nav>
 
     <div id="myCarousel" class="carousel slide">
-        <!-- Indicators -->
         <ol class="carousel-indicators">
             <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
             <li data-target="#myCarousel" data-slide-to="1"></li>
@@ -129,7 +141,6 @@
             <li data-target="#myCarousel" data-slide-to="7"></li>
         </ol>
 
-        <!-- Wrapper for slides -->
         <div class="carousel-inner">
         
             <div id="initial-heap" class="item active">
@@ -137,10 +148,9 @@
                 <div class="container top-buffer">
 
                 	<div class="row section">
-                		<div class="col-md-1">.col-md-1</div>
+                		<div class="col-md-1"></div>
                 		
-                		
-                		<div class="col-md-5">
+                		<div class="figure col-md-5">
                 			<div class="heap">
                 				<div class="h-label">
                 					<span class="eden">Eden</span>
@@ -240,25 +250,19 @@
                 			</div>
                 		</div>
                 		<div class="col-md-4">
-                			<div class="alert alert-success" role="alert">Application Stopped</div>
-                			<button type="button" class="btn btn-default">
-  <span class="glyphicon glyphicon-repeat"></span> Repeat
-</button>
-                			<h1>A Full Width Image Slider Template</h1>
-							<p>This is a great starting point for yet another modern and
-								stylish website. Here are some things to consider when working
-								with this template:</p>
+                			<div class="btn-group btn-group-sm">
+                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+							</div>
+                			<h3>The Layout of the heap</h3>
 							<ul>
-								<li>Unique Fonts</li>
-								<li>Attractive Colors</li>
-								<li>Content Spacing for Legibility and Design</li>
-								<li>Decent Pictures that Still Load Quickly (less than
-									400KB for example)</li>
-								<li>Make the Pictures INFORMATIVE</li>
-								<li>Custom Styling for the Captions</li>
+								<li><strong>The eden</strong> This is where most new objects are allocated (not all, as large objects may be allocated directly into the old generation). The eden is almost always empty after a minor garbage collection. </li>
+								<li><strong>The two survivor spaces (S1, S2)</strong> These hold objects that have survived at least one minor garbage collection.</li>
+								<li><strong>The Old generation</strong> Objects that are longer-lived are eventually promoted, or tenured, to the old generation.</li>
 							</ul>
-                			
-                			
+							<div class="well well-sm">
+      The Application is not running.
+    </div>
                 		</div>
                 		
                 	</div>
@@ -266,24 +270,208 @@
             </div>
             
             <div id="eden-allocate" class="item">
+            	<div class="container top-buffer">
+                	<div class="row section">
+                		<div class="col-md-1"></div>
+                		<div class="figure col-md-5">
+                		</div>
+                		<div class="col-md-4">
+                			<div class="btn-group btn-group-sm">
+                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();edenAllocate();">
+  									<span class="glyphicon glyphicon-repeat"></span>
+								</button>
+        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+							</div>
+                			<h3>Eden Allocation
+							</h3>
+							<ul>
+								<li>Allocations into the eden by using what’s referred to as "the bump-the-pointer technique"</li>
+								<li>The end of the last allocated object is tracked, and when a new allocation request needs to be satisfied, the allocator needs only to check whether it will fit between top and the end of the eden. If it does, top is bumped to the end of the newly allocated object</li>
+							</ul>
+							<ul class="list-group">
+  								<li class="list-group-item">The Application is running.</li>
+							</ul>
+                			
+                		</div>
+                	</div>
+				</div>
 			</div>
 			
             <div id="minor-gc-01" class="item">
+            	<div class="container top-buffer">
+                	<div class="row section">
+                		<div class="col-md-1"></div>
+                		<div class="figure col-md-5">
+                		</div>
+                		<div class="col-md-4">
+                			<div class="btn-group btn-group-sm">
+                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();minorGC01();">
+  									<span class="glyphicon glyphicon-repeat"></span>
+								</button>
+        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+							</div>
+                			<h3>Minor Garbage Collection 01
+							</h3>
+							<ol>
+								<li>Objects that have been found to be garbage are marked with a X.</li>
+								<li>Live objects in the eden that survive the collection are copied to the unused survivor space(S1).</li>
+								<li>Finally the eden is entirely empty</li>
+							</ol>
+							<ul class="list-group">
+  								<li class="list-group-item">The Application is stopped for garbage collection.</li>
+							</ul>
+                			
+                		</div>
+                	</div>
+				</div>
             </div>
             
             <div id="minor-gc-02" class="item">
+            	<div class="container top-buffer">
+                	<div class="row section">
+                		<div class="col-md-1"></div>
+                		<div class="figure col-md-5">
+                		</div>
+                		<div class="col-md-4">
+                			<div class="btn-group btn-group-sm">
+                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();minorGC02();">
+  									<span class="glyphicon glyphicon-repeat"></span>
+								</button>
+        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+							</div>
+                			<h3>Minor Garbage Collection 02
+							</h3>
+							<ol>
+								<li>Objects that have been found in Eden and Survivor(S1) to be garbage are marked with a X.</li>
+								<li>Live objects in the eden that survive the collection are copied to the unused survivor space(S2).</li>
+								<li>Live objects in the survivor space that is in use, which will be given another chance to be reclaimed in the young generation, are also copied to the unused survivor space(S2).</li>
+								<li>At the end of the minor garbage collection, the two survivor spaces swap roles.</li>
+								<li>Finally the eden is entirely empty and only one survivor space is in use.</li>
+							</ol>
+							<ul class="list-group">
+  								<li class="list-group-item">The Application is stopped for garbage collection.</li>
+							</ul>
+                			
+                		</div>
+                	</div>
+				</div>
             </div>
             
             <div id="minor-gc-03" class="item">
+            	<div class="container top-buffer">
+                	<div class="row section">
+                		<div class="col-md-1"></div>
+                		<div class="figure col-md-5">
+                		</div>
+                		<div class="col-md-4">
+                			<div class="btn-group btn-group-sm">
+                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();minorGC03();">
+  									<span class="glyphicon glyphicon-repeat"></span>
+								</button>
+        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+							</div>
+                			<h3>Minor Garbage Collection 03
+							</h3>
+							<ul>
+								<li>Same as before. just for checking swapped survivor spaces.</li>
+							</ul>
+							<ul class="list-group">
+  								<li class="list-group-item">The Application is stopped for garbage collection.</li>
+							</ul>
+                			
+                		</div>
+                	</div>
+				</div>
             </div>
             
             <div id="minor-gc-04" class="item">
+            	<div class="container top-buffer">
+                	<div class="row section">
+                		<div class="col-md-1"></div>
+                		<div class="figure col-md-5">
+                		</div>
+                		<div class="col-md-4">
+                			<div class="btn-group btn-group-sm">
+                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();minorGC04();">
+  									<span class="glyphicon glyphicon-repeat"></span>
+								</button>
+        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+							</div>
+                			<h3>Minor Garbage Collection 04
+							</h3>
+							<ul>
+								<li>Live objects in the survivor space that is in use, that are deemed “old enough”, are promoted to the old generation.</li>
+								<li>During a minor garbage collection, there is no guarantee that the allocating survivor space will always be large enough to accommodate the surviving objects from both the eden and the other survivor space. If it overflows, the rest of the objects that need to be evacuated will be moved to the old generation. This is referred to as "premature promotion".</li>
+							</ul>
+							<ul class="list-group">
+  								<li class="list-group-item">The Application is stopped for garbage collection.</li>
+							</ul>
+                			
+                		</div>
+                	</div>
+				</div>
             </div>
             
             <div id="full-gc" class="item">
+            	<div class="container top-buffer">
+                	<div class="row section">
+                		<div class="col-md-1"></div>
+                		<div class="figure col-md-5">
+                		</div>
+                		<div class="col-md-4">
+                			<div class="btn-group btn-group-sm">
+                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();fullGC();">
+  									<span class="glyphicon glyphicon-repeat"></span>
+								</button>
+        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+							</div>
+                			<h3>Full Garbage Collection
+							</h3>
+							<p>mark-compact garbage collector</p>
+							<ol>
+								<li>The mark-compact garbage collector first identifies which objects are still live in the old generation.</li>
+								<li>Then the collector slides live objects toward the beginning of the heap, leaving any free space in a single contiguous chunk at the end of the heap.</li>
+								<li>Future allocations into the old generation to use the fast bump-the-pointer technique.</li>
+							</ol>
+							<ul class="list-group">
+  								<li class="list-group-item">The Application is stopped for garbage collection.</li>
+							</ul>
+                			
+                		</div>
+                	</div>
+				</div>
             </div>
             
             <div id="minor-gc-05" class="item">
+            	<div class="container top-buffer">
+                	<div class="row section">
+                		<div class="col-md-1"></div>
+                		<div class="figure col-md-5">
+                		</div>
+                		<div class="col-md-4">
+                			<div class="btn-group btn-group-sm">
+                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();minorGC05();">
+  									<span class="glyphicon glyphicon-repeat"></span>
+								</button>
+        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+							</div>
+                			<h3>Minor Garbage Collection 05
+							</h3>
+							<p>This is basic cycle of Serial Garbage collection.(same as Parallel Garbage collection but multithreaded collectors)</p>
+							<ul class="list-group">
+  								<li class="list-group-item">The Application is stopped for garbage collection.</li>
+							</ul>
+                			
+                		</div>
+                	</div>
+				</div>
             </div>
             
         </div>
@@ -317,6 +505,16 @@
     	$(".carousel").carousel({
             interval : false
         });
+    	
+    	
+    	$(".carousel-inner button span.glyphicon-chevron-left").click(function(){
+    		$(".carousel").carousel("prev");	
+    	});
+    	
+    	$(".carousel-inner button span.glyphicon-chevron-right").click(function(){
+    		$(".carousel").carousel("next");	
+    	});
+    	
 		
     	
     	initializeHeapLayout();
@@ -394,45 +592,45 @@
     	var _exceptTargets = exceptTargets || {};
     	if( _exceptTargets["eden-allocate"]){
     	}else{
-    		$("#eden-allocate .container").remove();
-        	$("#eden-allocate").append($("#initial-heap .container").clone());    		
+    		$("#eden-allocate .heap").remove();
+        	$("#eden-allocate .figure").append($("#initial-heap .heap").clone());    		
     	}
     	
     	if( _exceptTargets["minor-gc-01"]){
     	}else{
-    		$("#minor-gc-01 .container").remove();
-        	$("#minor-gc-01").append($("#initial-heap .container").clone());
+    		$("#minor-gc-01 .heap").remove();
+        	$("#minor-gc-01 .figure").append($("#initial-heap .heap").clone());
         	$("#minor-gc-01 .eden .object").removeClass("empty");	
     	}
     	
     	if( _exceptTargets["minor-gc-02"]){
     	}else{
-    		$("#minor-gc-02 .container").remove();
-    		$("#minor-gc-02").append($("#initial-heap .container").clone());
+    		$("#minor-gc-02 .heap").remove();
+    		$("#minor-gc-02 .figure").append($("#initial-heap .heap").clone());
     		$("#minor-gc-02 .eden .object").removeClass("empty");
     		$("#minor-gc-02 .s1 .object").removeClass("empty");
     	}
     	
     	if( _exceptTargets["minor-gc-03"]){
     	}else{
-    		$("#minor-gc-03 .container").remove();
-    		$("#minor-gc-03").append($("#initial-heap .container").clone());
+    		$("#minor-gc-03 .heap").remove();
+    		$("#minor-gc-03 .figure").append($("#initial-heap .heap").clone());
     		$("#minor-gc-03 .eden .object").removeClass("empty");
     		$("#minor-gc-03 .s2 .object").removeClass("empty");
     	}
     	
     	if( _exceptTargets["minor-gc-04"]){
     	}else{
-    		$("#minor-gc-04 .container").remove();
-    		$("#minor-gc-04").append($("#initial-heap .container").clone());
+    		$("#minor-gc-04 .heap").remove();
+    		$("#minor-gc-04 .figure").append($("#initial-heap .heap").clone());
     		$("#minor-gc-04 .eden .object").removeClass("empty");
     		$("#minor-gc-04 .s1 .object").removeClass("empty");
     	}
     	
     	if( _exceptTargets["full-gc"]){
     	}else{
-    		$("#full-gc .container").remove();
-    		$("#full-gc").append($("#initial-heap .container").clone());
+    		$("#full-gc .heap").remove();
+    		$("#full-gc .figure").append($("#initial-heap .heap").clone());
     		$("#full-gc .eden .object").removeClass("empty");
     		$("#full-gc .s2 .object").removeClass("empty");
     		$("#full-gc .old .object").removeClass("empty");
@@ -440,8 +638,8 @@
     	
     	if( _exceptTargets["minor-gc-05"]){
     	}else{
-    		$("#minor-gc-05 .container").remove();
-    		$("#minor-gc-05").append($("#initial-heap .container").clone());
+    		$("#minor-gc-05 .heap").remove();
+    		$("#minor-gc-05 .figure").append($("#initial-heap .heap").clone());
     		$("#minor-gc-05 .eden .object").removeClass("empty");
     		$("#minor-gc-05 .s1 .object").removeClass("empty");
     		$("#minor-gc-05 .old .object").slice(0,5).removeClass("empty");
