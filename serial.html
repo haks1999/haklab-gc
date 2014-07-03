@@ -507,11 +507,11 @@ border-radius: 3px;
         });
     	
     	
-    	$(".carousel-inner button span.glyphicon-chevron-left").click(function(){
+    	$(".carousel-inner button span.glyphicon-chevron-left").parent().click(function(){
     		$(".carousel").carousel("prev");	
     	});
     	
-    	$(".carousel-inner button span.glyphicon-chevron-right").click(function(){
+    	$(".carousel-inner button span.glyphicon-chevron-right").parent().click(function(){
     		$(".carousel").carousel("next");	
     	});
     	
