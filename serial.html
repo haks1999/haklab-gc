@@ -261,8 +261,8 @@ border-radius: 3px;
 								<li><strong>The Old generation</strong> Objects that are longer-lived are eventually promoted, or tenured, to the old generation.</li>
 							</ul>
 							<div class="well well-sm">
-      The Application is not running.
-    </div>
+      							The Application is not running.
+    						</div>
                 		</div>
                 		
                 	</div>
@@ -289,9 +289,9 @@ border-radius: 3px;
 								<li>Allocations into the eden by using what’s referred to as "the bump-the-pointer technique"</li>
 								<li>The end of the last allocated object is tracked, and when a new allocation request needs to be satisfied, the allocator needs only to check whether it will fit between top and the end of the eden. If it does, top is bumped to the end of the newly allocated object</li>
 							</ul>
-							<ul class="list-group">
-  								<li class="list-group-item">The Application is running.</li>
-							</ul>
+							<div class="well well-sm">
+      							The Application is running.
+    						</div>
                 			
                 		</div>
                 	</div>
@@ -319,10 +319,9 @@ border-radius: 3px;
 								<li>Live objects in the eden that survive the collection are copied to the unused survivor space(S1).</li>
 								<li>Finally the eden is entirely empty</li>
 							</ol>
-							<ul class="list-group">
-  								<li class="list-group-item">The Application is stopped for garbage collection.</li>
-							</ul>
-                			
+							<div class="well well-sm">
+      							The Application is stopped for garbage collection.
+    						</div>
                 		</div>
                 	</div>
 				</div>
@@ -351,9 +350,9 @@ border-radius: 3px;
 								<li>At the end of the minor garbage collection, the two survivor spaces swap roles.</li>
 								<li>Finally the eden is entirely empty and only one survivor space is in use.</li>
 							</ol>
-							<ul class="list-group">
-  								<li class="list-group-item">The Application is stopped for garbage collection.</li>
-							</ul>
+							<div class="well well-sm">
+      							The Application is stopped for garbage collection.
+    						</div>
                 			
                 		</div>
                 	</div>
@@ -379,9 +378,9 @@ border-radius: 3px;
 							<ul>
 								<li>Same as before. just for checking swapped survivor spaces.</li>
 							</ul>
-							<ul class="list-group">
-  								<li class="list-group-item">The Application is stopped for garbage collection.</li>
-							</ul>
+							<div class="well well-sm">
+      							The Application is stopped for garbage collection.
+    						</div>
                 			
                 		</div>
                 	</div>
@@ -408,9 +407,9 @@ border-radius: 3px;
 								<li>Live objects in the survivor space that is in use, that are deemed “old enough”, are promoted to the old generation.</li>
 								<li>During a minor garbage collection, there is no guarantee that the allocating survivor space will always be large enough to accommodate the surviving objects from both the eden and the other survivor space. If it overflows, the rest of the objects that need to be evacuated will be moved to the old generation. This is referred to as "premature promotion".</li>
 							</ul>
-							<ul class="list-group">
-  								<li class="list-group-item">The Application is stopped for garbage collection.</li>
-							</ul>
+							<div class="well well-sm">
+      							The Application is stopped for garbage collection.
+    						</div>
                 			
                 		</div>
                 	</div>
@@ -439,9 +438,9 @@ border-radius: 3px;
 								<li>Then the collector slides live objects toward the beginning of the heap, leaving any free space in a single contiguous chunk at the end of the heap.</li>
 								<li>Future allocations into the old generation to use the fast bump-the-pointer technique.</li>
 							</ol>
-							<ul class="list-group">
-  								<li class="list-group-item">The Application is stopped for garbage collection.</li>
-							</ul>
+							<div class="well well-sm">
+      							The Application is stopped for garbage collection.
+    						</div>
                 			
                 		</div>
                 	</div>
@@ -465,9 +464,9 @@ border-radius: 3px;
                 			<h3>Minor Garbage Collection 05
 							</h3>
 							<p>This is basic cycle of Serial Garbage collection.(same as Parallel Garbage collection but multithreaded collectors)</p>
-							<ul class="list-group">
-  								<li class="list-group-item">The Application is stopped for garbage collection.</li>
-							</ul>
+							<div class="well well-sm">
+      							The Application is stopped for garbage collection.
+    						</div>
                 			
                 		</div>
                 	</div>
@@ -489,6 +488,7 @@ border-radius: 3px;
     <footer>
     	<div class="container">
         	<p>Created by <a href="mailto:haks1999@gmail.com">haks1999@gmail.com</a></p>
+        	<p> View on gitbub <a href="https://github.com/haks1999/haklab-gc">hakslab-gc</a></p>
 		</div>
 	</footer>
 
