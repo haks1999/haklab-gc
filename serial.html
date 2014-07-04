@@ -11,93 +11,7 @@
 
     <link href="css/bootstrap.css" rel="stylesheet">
     <link href="css/full-slider.css" rel="stylesheet">
-    
-    <style type="text/css">
-    	.top-buffer { margin-top:100px; }
-    	.heap {
-    		width:375px;border-radius:5px;background-color:#555;padding:10px;
-    	}
-    	.heap .young{
-    		height:150px;
-    	}
-    	.heap .young .space, .heap .old{
-    		border-radius:5px;
-    	}
-    	.heap .young .space{
-    		height:145px;float:left;
-    	}
-    	.heap .young .eden {
-    		width:180px;background-color:#5bc0de;
-    	}
-    	.heap .young .s1 {
-    		width:75px;background-color:#5bc0de;margin-left:12px;
-    	}
-    	.heap .young .s2 {
-    		width:75px;background-color:#5bc0de;margin-left:12px;
-    	}
-    	.heap .old {
-    		height:145px;background-color:#428bca;
-    	}
-    	.heap .object{
-    		width:30px;height:30px;background-color:#f0ad4e;margin-left:5px;margin-top:5px;float:left;border-radius:10px;border:3px solid #555;
-    	}
-    	.heap .object.notuse{
-    		border-style:dotted; font-size: 15px;font-weight: bold;color:#555;line-height:0px;padding: 5px 2px; 
-    	}
-    	.heap .object.notuse:before{
-    		content:"x";
-    	}
-    	.heap .young .object.copying{
-    		background-color:#5bc0de;border-style:dotted;
-    	}
-    	.heap .old .object.copying{
-    		background-color:#428bca;border-style:dotted;
-    	}
-    	.heap .object.empty{
-    		display:none;
-    	}
-    	.heap .h-label{
-    		color:#eee;font-weight:bold;
-    	}
-    	.heap .h-label span{
-    		text-align:center;display:inline-block;
-    	}
-    	.heap .h-label div{
-    		text-align:center;
-    	}
-    	.heap .h-label .eden {
-    		width:180px;
-    	}
-    	.heap .h-label .s1 {
-    		width:70px;margin-left:10px;
-    	}
-    	.heap .h-label .s2 {
-    		width:70px;margin-left:10px;
-    	}
-
-   		footer{
-   			padding-top: 40px;padding-bottom: 40px;margin-top: 100px;color: #777;text-align: center;border-top: 1px solid #e5e5e5;
-   		}
-   	
-   	.bs-callout+.bs-callout {
-margin-top: -5px;
-}
-
-	
-   		.bs-callout-info {
-border-left-color: #5bc0de;
-}
-.bs-callout {
-padding: 20px;
-margin: 20px 0;
-border: 1px solid #eee;
-border-left-width: 5px;
-border-radius: 3px;
-}
-
-
-
-    </style>
+    <link href="css/visual-gc.css" rel="stylesheet">
 
 </head>
 
@@ -113,16 +27,14 @@ border-radius: 3px;
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.php">Start Bootstrap</a>
+                <a class="navbar-brand" href="/">Visual GC</a>
             </div>
 
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="#about">About</a>
+                    <li><a href="serial.html">Serial &amp; Parallel</a>
                     </li>
-                    <li><a href="#services">Services</a>
-                    </li>
-                    <li><a href="#contact">Contact</a>
+                    <li><a href="cms.html">CMS</a>
                     </li>
                 </ul>
             </div>
@@ -416,7 +328,7 @@ border-radius: 3px;
 				</div>
             </div>
             
-            <div id="full-gc" class="item">
+            <div id="full-gc-serial" class="item">
             	<div class="container top-buffer">
                 	<div class="row section">
                 		<div class="col-md-1"></div>
@@ -425,7 +337,7 @@ border-radius: 3px;
                 		<div class="col-md-4">
                 			<div class="btn-group btn-group-sm">
                 				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
-								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();fullGC();">
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();fullGC_Serial();">
   									<span class="glyphicon glyphicon-repeat"></span>
 								</button>
         						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
@@ -497,6 +409,7 @@ border-radius: 3px;
    	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script src="js/bootstrap.js"></script>
+    <script src="js/visual-gc.js"></script>
 
     <!-- Script to Activate the Carousel -->
     <script>
@@ -544,9 +457,9 @@ border-radius: 3px;
             	initializeHeapLayout({"minor-gc-04":true});            	
             	minorGC04();
             	
-            }else if( activeItemId == "full-gc"){
-            	initializeHeapLayout({"full-gc":true});
-            	fullGC();
+            }else if( activeItemId == "full-gc-serial"){
+            	initializeHeapLayout({"full-gc-serial":true});
+            	fullGC_Serial();
             	
             }else if( activeItemId == "minor-gc-05"){
             	initializeHeapLayout({"minor-gc-05":true});            	
@@ -563,25 +476,6 @@ border-radius: 3px;
     })
     */
     
-    var CONST = {
-    		OBJ:{
-    			COPY_SPD: 800
-    		},
-    		EDEN : {
-    			MAX_SIZE : 20,
-    			LOC_RATE : 500,
-    			MARK_RATE : 600
-    		},
-    		SUV : {
-    			MAX_SIZE : 8,
-    			MARK_RATE : 600
-    		},
-    		OLD : {
-    			MAX_SIZE : 40,
-    			MARK_RATE : 400,
-    			DEL_RATE : 400
-    		}
-    	};
     
     function initializeHeapLayout(exceptTargets){
     	for (var inx = 0; inx < timeoutList.length; inx++) {
@@ -627,13 +521,13 @@ border-radius: 3px;
     		$("#minor-gc-04 .s1 .object").removeClass("empty");
     	}
     	
-    	if( _exceptTargets["full-gc"]){
+    	if( _exceptTargets["full-gc-serial"]){
     	}else{
-    		$("#full-gc .heap").remove();
-    		$("#full-gc .figure").append($("#initial-heap .heap").clone());
-    		$("#full-gc .eden .object").removeClass("empty");
-    		$("#full-gc .s2 .object").removeClass("empty");
-    		$("#full-gc .old .object").removeClass("empty");
+    		$("#full-gc-serial .heap").remove();
+    		$("#full-gc-serial .figure").append($("#initial-heap .heap").clone());
+    		$("#full-gc-serial .eden .object").removeClass("empty");
+    		$("#full-gc-serial .s2 .object").removeClass("empty");
+    		$("#full-gc-serial .old .object").removeClass("empty");
     	}
     	
     	if( _exceptTargets["minor-gc-05"]){
@@ -646,182 +540,6 @@ border-radius: 3px;
     	}
     };
     
-    function edenAllocate(){
-    	var locNum = 1;
-    	var allocateFnc = function(allocateObjNum, currentAllocatePos, timeout ){
-    		var _tf = setTimeout(function(){
-    			$("#eden-allocate .eden .object").slice(currentAllocatePos, allocateObjNum + currentAllocatePos).fadeIn("slow");            			
-    		},timeout);
-    		timeoutList.push(_tf);
-		}
-    	var currentAllocatePos = 0;
-    	while( currentAllocatePos < CONST.EDEN.MAX_SIZE ){
-    		var allocateObjNum = getRandomInt(1,3);
-    		allocateFnc(allocateObjNum, currentAllocatePos,CONST.EDEN.LOC_RATE*locNum++);
-    		currentAllocatePos += allocateObjNum;
-    	}
-    };
-    
-    function minorGC01(){
-    	markNotuse("eden", minorGC_allocateEdenToS1);
-    };
-    
-    function minorGC02(){
-    	markNotuse("eden", minorGC_allocateEdenToS2);
-    	markNotuse("s1", minorGC_allocateS1ToS2);
-    };
-    
-    function minorGC03(){
-    	markNotuse("eden", minorGC_allocateEdenToS1);
-    	markNotuse("s2", minorGC_allocateS2ToS1);
-    };
-    
-    function minorGC04(){
-    	markNotuse("eden", minorGC_allocateEdenToS2);
-    	markNotuse("s1", minorGC_allocateS1ToS2Old);
-    };
-    
-    function fullGC(){
-    	markNotuse("old",fullGC_compactAndSweep)
-    };
-    
-    function minorGC05(){
-    	markNotuse("eden", minorGC_allocateEdenToS2);
-    	markNotuse("s1", minorGC_allocateS1ToS2Old);
-    };
-    
-   	var timeoutList = [];
-    function markNotuse(target, callback){
-    	var maxSize = target == 'eden'?CONST.EDEN.MAX_SIZE:(target=='old'?CONST.OLD.MAX_SIZE:CONST.SUV.MAX_SIZE);
-    	var markRate = target == 'eden'?CONST.EDEN.MARK_RATE:(target=='old'?CONST.OLD.MARK_RATE:CONST.SUV.MARK_RATE);
-    	var survivoredObjNum = target=='old'?getRandomInt(10,20):getRandomInt(2,4);
-    	var survivoredObjPosArr = [];
-    	var curSurvivoredObjNum = 0;
-    	while( curSurvivoredObjNum < survivoredObjNum ){
-    		var randPos = getRandomInt(1,maxSize);
-    		var dupRandPos = false;
-    		for( var inx = 0 ; inx < survivoredObjPosArr.length;inx++ ){
-    			dupRandPos = Number(survivoredObjPosArr[inx]) == randPos; 
-    		}
-    		if( !dupRandPos ){
-    			curSurvivoredObjNum++;
-    			survivoredObjPosArr.push(randPos);
-    		}
-    	}
-    	
-    	var markNotUseFnc = function(befSurvivoredObjPos, survivoredObjPos, timeout, callbackFnc, posArr){
-    		var _tf=setTimeout(function(){
-    			$(".carousel-inner .item.active ." + target + " .object").slice(befSurvivoredObjPos, survivoredObjPos).addClass("notuse");
-    			if( callbackFnc ) callbackFnc.call(null, posArr);	
-    		},timeout);
-    		timeoutList.push(_tf);
-    	};
-    	survivoredObjPosArr.sort(function(a, b){return a-b});
-    	
-    	var befSurvivoredObjPos = 0;
-    	for(var inx = 0 ; inx < survivoredObjPosArr.length ; inx++ ){
-    		markNotUseFnc(befSurvivoredObjPos, Number(survivoredObjPosArr[inx]-1), markRate*inx);
-    		$(".carousel-inner .item.active ." + target + " .object:eq(" + (survivoredObjPosArr[inx]-1) + ")").addClass("use");
-    		befSurvivoredObjPos = Number(survivoredObjPosArr[inx]);
-    	}
-    	markNotUseFnc(befSurvivoredObjPos,maxSize,markRate*survivoredObjPosArr.length,callback,survivoredObjPosArr );
-    };
-    
-    function copyObjects(src, trg, posArr){
-    	var startingPos = getStartingOffset();
-    	
-    	var movingPosToArr = [];
-    	$(".carousel-inner .item.active ." + trg + " .object.empty:not(.copying)").slice(0, posArr.length).removeClass("empty").addClass("copying _" + src );
-    	$(".carousel-inner .item.active ." + trg + " .object.copying._" + src).each(function(){
-    		movingPosToArr.push({left:$(this).offset().left-startingPos.left,top:$(this).offset().top-startingPos.top});
-    	});
-
-    	var movingPosToArrIdx = 0;
-    	$(".carousel-inner .item.active ." + src + " .object.use").addClass("copying");
-    	$(".carousel-inner .item.active ." + src + " .object.use").each(function(){
-    		if(movingPosToArrIdx > movingPosToArr.length - 1) return;
-    		var position = $(this).offset();
-    		var copyingObj = $(this).clone();
-    		$(copyingObj).css("position","absolute").css("left",position.left-startingPos.left).css("top", position.top-startingPos.top).addClass("moving").appendTo($(".carousel-inner .item.active .heap"));
-			$(copyingObj).animate({left:movingPosToArr[movingPosToArrIdx].left,top:movingPosToArr[movingPosToArrIdx++].top},CONST.OBJ.COPY_SPD);    		
-    	});
-    	var _tf = setTimeout(function(){
-    		$(".carousel-inner .item.active ." + src + " .object").fadeOut("slow");
-    	},CONST.OBJ.COPY_SPD);
-    	timeoutList.push(_tf);
-    };
-    
-    function minorGC_allocateEdenToS1(posArr){
-    	copyObjects("eden", "s1", posArr);
-    };
-    
-    function minorGC_allocateEdenToS2(posArr){
-    	copyObjects("eden", "s2", posArr);
-    };
-    
-    function minorGC_allocateS1ToS2(posArr){
-    	copyObjects("s1", "s2", posArr);
-    };
-    
-    function minorGC_allocateS2ToS1(posArr){
-    	copyObjects("s2", "s1", posArr);
-    };
-    
-    function minorGC_allocateS1ToS2Old(posArr){
-    	if( posArr.length > 1 ){
-    		copyObjects("s1", "s2", posArr.slice(0,1));
-    		copyObjects("s1", "old", posArr.slice(1,posArr.length));
-    	}else{
-    		copyObjects("s1", "old", posArr);
-    	}
-    };
-    
-    function fullGC_compactAndSweep(posArr){
-    	
-    	var sweepFnc = function(sweepStartPos, sweepEndPos, timeout, del){
-    		var _tf=setTimeout(function(){
-    			if(del){
-    				$(".carousel-inner .item.active .old .object").slice(sweepStartPos,sweepEndPos).fadeOut("slow");
-    			}else{
-    				$(".carousel-inner .item.active .old .object").slice(sweepStartPos,sweepEndPos).removeClass("notuse").addClass("copying");
-    			}
-    		},timeout);
-    		timeoutList.push(_tf);
-    	};
-    	
-    	var befPos = 0;
-    	var posIdx = 0;
-    	var delTimer = 1;
-    	$(".carousel-inner .item.active .old .object").each(function(){
-    		if($(this).hasClass("use")){
-    			sweepFnc(befPos,posIdx,CONST.OLD.DEL_RATE*delTimer++);
-    			befPos = posIdx+1;
-    		}
-    		posIdx++;
-    	});
-    	sweepFnc(befPos,posIdx,CONST.OLD.DEL_RATE*delTimer++);
-    	
-    	var befPos = 0;
-    	var posIdx = 0;
-    	$(".carousel-inner .item.active .old .object").each(function(){
-    		if($(this).hasClass("use")){
-    			sweepFnc(befPos,posIdx,CONST.OLD.DEL_RATE*delTimer++,true);
-    			befPos = posIdx+1;
-    		}
-    		posIdx++;
-    	});
-    	sweepFnc(befPos,posIdx,CONST.OLD.DEL_RATE*delTimer++,true);
-    };
-    
-    
-    function getStartingOffset(){
-    	var _offset = $(".carousel-inner .item.active .heap").offset();
-    	return {left:Number(_offset.left)-10, top: Number(_offset.top)+5};
-    };
-    
-    function getRandomInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    };
     </script>
 </body>
 
