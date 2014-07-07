@@ -25,12 +25,26 @@
     	}
     	.heap .object{
     		width:30px;height:30px;background-color:#f0ad4e;margin-left:5px;margin-top:5px;float:left;border-radius:10px;border:3px solid #555;
+    		
     	}
     	.heap .object.notuse{
     		border-style:dotted; font-size: 15px;font-weight: bold;color:#555;line-height:0px;padding: 5px 2px; 
     	}
     	.heap .object.notuse:before{
     		content:"x";
+    	}
+    	/**
+    	#5cb85c
+    	#449d44
+    	
+    	#d9534f
+    	#c9302c
+    	*/
+    	.heap .object.markuse{
+    background-image: radial-gradient(circle at center, #d9534f 4px, transparent 5px);
+    background-size: 15px 15px;
+    background-position: top left;
+    background-repeat: no-repeat;
     	}
     	.heap .young .object.copying{
     		background-color:#5bc0de;border-style:dotted;
@@ -64,18 +78,3 @@
    			padding-top: 40px;padding-bottom: 40px;margin-top: 100px;color: #777;text-align: center;border-top: 1px solid #e5e5e5;
    		}
    	
-   	.bs-callout+.bs-callout {
-margin-top: -5px;
-}
-
-	
-   		.bs-callout-info {
-border-left-color: #5bc0de;
-}
-.bs-callout {
-padding: 20px;
-margin: 20px 0;
-border: 1px solid #eee;
-border-left-width: 5px;
-border-radius: 3px;
-}

@@ -55,16 +55,22 @@ function minorGC04(){
 	markNotuse("s1", minorGC_allocateS1ToS2Old);
 };
 
-function fullGC_Serial(){
-	markNotuse("old",fullGC_compactAndSweep)
-};
-
 function minorGC05(){
 	markNotuse("eden", minorGC_allocateEdenToS2);
 	markNotuse("s1", minorGC_allocateS1ToS2Old);
 };
 
-	var timeoutList = [];
+function fullGC_Serial(){
+	markNotuse("old",fullGC_compactAndSweep)
+};
+
+function fullGC_CMS01(){
+	markUse("old",fullGC_initialMark)
+};
+
+
+
+var timeoutList = [];
 function markNotuse(target, callback){
 	var maxSize = target == 'eden'?CONST.EDEN.MAX_SIZE:(target=='old'?CONST.OLD.MAX_SIZE:CONST.SUV.MAX_SIZE);
 	var markRate = target == 'eden'?CONST.EDEN.MARK_RATE:(target=='old'?CONST.OLD.MARK_RATE:CONST.SUV.MARK_RATE);
@@ -99,6 +105,43 @@ function markNotuse(target, callback){
 		befSurvivoredObjPos = Number(survivoredObjPosArr[inx]);
 	}
 	markNotUseFnc(befSurvivoredObjPos,maxSize,markRate*survivoredObjPosArr.length,callback,survivoredObjPosArr );
+};
+
+function markUse(target, callback){
+	var maxSize = CONST.OLD.MAX_SIZE;
+	var markRate = CONST.OLD.MARK_RATE;
+	var survivoredObjNum = getRandomInt(5,10);
+	var survivoredObjPosArr = [];
+	var curSurvivoredObjNum = 0;
+	while( curSurvivoredObjNum < survivoredObjNum ){
+		var randPos = getRandomInt(1,maxSize);
+		var dupRandPos = false;
+		for( var inx = 0 ; inx < survivoredObjPosArr.length;inx++ ){
+			dupRandPos = Number(survivoredObjPosArr[inx]) == randPos; 
+		}
+		if( !dupRandPos ){
+			curSurvivoredObjNum++;
+			survivoredObjPosArr.push(randPos);
+		}
+	}
+	console.log(survivoredObjPosArr);
+	
+	var markUseFnc = function(survivoredObjPos, timeout, callbackFnc){
+		var _tf=setTimeout(function(){
+			//$(".carousel-inner .item.active ." + target + " .object").slice(befSurvivoredObjPos, survivoredObjPos).addClass("notuse");
+			$(".carousel-inner .item.active ." + target + " .object:eq(" + survivoredObjPos + ")").addClass("markuse");
+			//if( callbackFnc ) callbackFnc.call(null, posArr);	
+		},timeout);
+		timeoutList.push(_tf);
+	};
+	survivoredObjPosArr.sort(function(a, b){return a-b});
+	
+	for(var inx = 0 ; inx < survivoredObjPosArr.length ; inx++ ){
+		markUseFnc(Number(survivoredObjPosArr[inx]-1), markRate*inx);
+		//$(".carousel-inner .item.active ." + target + " .object:eq(" + (survivoredObjPosArr[inx]-1) + ")").addClass("use");
+		//befSurvivoredObjPos = Number(survivoredObjPosArr[inx]);
+	}
+	//markUseFnc(maxSize,markRate*survivoredObjPosArr.length,callback,survivoredObjPosArr );
 };
 
 function copyObjects(src, trg, posArr){
@@ -152,6 +195,43 @@ function minorGC_allocateS1ToS2Old(posArr){
 
 function fullGC_compactAndSweep(posArr){
 	
+	var sweepFnc = function(sweepStartPos, sweepEndPos, timeout, del){
+		var _tf=setTimeout(function(){
+			if(del){
+				$(".carousel-inner .item.active .old .object").slice(sweepStartPos,sweepEndPos).fadeOut("slow");
+			}else{
+				$(".carousel-inner .item.active .old .object").slice(sweepStartPos,sweepEndPos).removeClass("notuse").addClass("copying");
+			}
+		},timeout);
+		timeoutList.push(_tf);
+	};
+	
+	var befPos = 0;
+	var posIdx = 0;
+	var delTimer = 1;
+	$(".carousel-inner .item.active .old .object").each(function(){
+		if($(this).hasClass("use")){
+			sweepFnc(befPos,posIdx,CONST.OLD.DEL_RATE*delTimer++);
+			befPos = posIdx+1;
+		}
+		posIdx++;
+	});
+	sweepFnc(befPos,posIdx,CONST.OLD.DEL_RATE*delTimer++);
+	
+	var befPos = 0;
+	var posIdx = 0;
+	$(".carousel-inner .item.active .old .object").each(function(){
+		if($(this).hasClass("use")){
+			sweepFnc(befPos,posIdx,CONST.OLD.DEL_RATE*delTimer++,true);
+			befPos = posIdx+1;
+		}
+		posIdx++;
+	});
+	sweepFnc(befPos,posIdx,CONST.OLD.DEL_RATE*delTimer++,true);
+};
+
+function fullGC_initialMark(posArr){
+	return;
 	var sweepFnc = function(sweepStartPos, sweepEndPos, timeout, del){
 		var _tf=setTimeout(function(){
 			if(del){
