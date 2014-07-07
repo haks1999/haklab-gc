@@ -350,8 +350,8 @@
 								<li>Then the collector slides live objects toward the beginning of the heap, leaving any free space in a single contiguous chunk at the end of the heap.</li>
 								<li>Future allocations into the old generation to use the fast bump-the-pointer technique.</li>
 							</ol>
-							<div class="well well-sm">
-      							The Application is stopped for garbage collection.
+							<div class="app-state well well-sm">
+      							The Application is stopped for [Initial Mark].
     						</div>
                 			
                 		</div>
@@ -410,6 +410,7 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script src="js/bootstrap.js"></script>
     <script src="js/visual-gc.js"></script>
+    <script src="js/jquery.jsPlumb-1.6.2-min.js "></script>
 
     <!-- Script to Activate the Carousel -->
     <script>
@@ -520,10 +521,14 @@
     	
     	if( _exceptTargets["full-gc-cms-01"]){
     	}else{
+    		jsPlumb.reset();
+    		$("#full-gc-cms-01 div.app-state").text("The Application is stopped for [Initial Mark].");
+    		$("#full-gc-cms-01 svg").remove();
+    		$("#full-gc-cms-01 div._jsPlumb_endpoint").remove();
     		$("#full-gc-cms-01 .heap").remove();
     		$("#full-gc-cms-01 .figure").append($("#initial-heap .heap").clone());
-    		$("#full-gc-cms-01 .eden .object").removeClass("empty");
-    		$("#full-gc-cms-01 .s2 .object").removeClass("empty");
+    		$("#full-gc-cms-01 .eden .object").slice(0,8).removeClass("empty");
+    		$("#full-gc-cms-01 .s2 .object").slice(0,5).removeClass("empty");
     		$("#full-gc-cms-01 .old .object").slice(0,30).removeClass("empty");
     	}
     	

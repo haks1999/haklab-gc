@@ -33,18 +33,11 @@
     	.heap .object.notuse:before{
     		content:"x";
     	}
-    	/**
-    	#5cb85c
-    	#449d44
-    	
-    	#d9534f
-    	#c9302c
-    	*/
     	.heap .object.markuse{
-    background-image: radial-gradient(circle at center, #d9534f 4px, transparent 5px);
-    background-size: 15px 15px;
-    background-position: top left;
-    background-repeat: no-repeat;
+    		background-image: radial-gradient(circle at center, #d9534f 4px, transparent 5px);
+    		background-size: 15px 15px;
+    		background-position: top left;
+    		background-repeat: no-repeat;
     	}
     	.heap .young .object.copying{
     		background-color:#5bc0de;border-style:dotted;

@@ -13,8 +13,10 @@ var CONST = {
     		},
     		OLD : {
     			MAX_SIZE : 40,
+    			CMS_SIZE : 30,
     			MARK_RATE : 400,
-    			DEL_RATE : 400
+    			DEL_RATE : 400,
+    			MARK_USE_RATE : 700
     		}
     	};
 
@@ -24,11 +26,11 @@ function edenAllocate(){
 	var locNum = 1;
 	var allocateFnc = function(allocateObjNum, currentAllocatePos, timeout ){
 		var _tf = setTimeout(function(){
-			$("#eden-allocate .eden .object").slice(currentAllocatePos, allocateObjNum + currentAllocatePos).fadeIn("slow");            			
+			$(".carousel-inner .item.active .eden .object").slice(currentAllocatePos, allocateObjNum + currentAllocatePos).fadeIn("slow").removeClass("empty");            			
 		},timeout);
 		timeoutList.push(_tf);
 	}
-	var currentAllocatePos = 0;
+	var currentAllocatePos = $(".carousel-inner .item.active .eden .object").not(".empty").length;
 	while( currentAllocatePos < CONST.EDEN.MAX_SIZE ){
 		var allocateObjNum = getRandomInt(1,3);
 		allocateFnc(allocateObjNum, currentAllocatePos,CONST.EDEN.LOC_RATE*locNum++);
@@ -65,7 +67,7 @@ function fullGC_Serial(){
 };
 
 function fullGC_CMS01(){
-	markUse("old",fullGC_initialMark)
+	initialMark("old")
 };
 
 
@@ -107,14 +109,12 @@ function markNotuse(target, callback){
 	markNotUseFnc(befSurvivoredObjPos,maxSize,markRate*survivoredObjPosArr.length,callback,survivoredObjPosArr );
 };
 
-function markUse(target, callback){
-	var maxSize = CONST.OLD.MAX_SIZE;
-	var markRate = CONST.OLD.MARK_RATE;
+function initialMark(target){
 	var survivoredObjNum = getRandomInt(5,10);
 	var survivoredObjPosArr = [];
 	var curSurvivoredObjNum = 0;
 	while( curSurvivoredObjNum < survivoredObjNum ){
-		var randPos = getRandomInt(1,maxSize);
+		var randPos = getRandomInt(1,CONST.OLD.CMS_SIZE);
 		var dupRandPos = false;
 		for( var inx = 0 ; inx < survivoredObjPosArr.length;inx++ ){
 			dupRandPos = Number(survivoredObjPosArr[inx]) == randPos; 
@@ -124,24 +124,79 @@ function markUse(target, callback){
 			survivoredObjPosArr.push(randPos);
 		}
 	}
-	console.log(survivoredObjPosArr);
 	
-	var markUseFnc = function(survivoredObjPos, timeout, callbackFnc){
+	var markUseFnc = function(survivoredObjPos, timeout){
 		var _tf=setTimeout(function(){
-			//$(".carousel-inner .item.active ." + target + " .object").slice(befSurvivoredObjPos, survivoredObjPos).addClass("notuse");
 			$(".carousel-inner .item.active ." + target + " .object:eq(" + survivoredObjPos + ")").addClass("markuse");
-			//if( callbackFnc ) callbackFnc.call(null, posArr);	
 		},timeout);
 		timeoutList.push(_tf);
 	};
 	survivoredObjPosArr.sort(function(a, b){return a-b});
 	
 	for(var inx = 0 ; inx < survivoredObjPosArr.length ; inx++ ){
-		markUseFnc(Number(survivoredObjPosArr[inx]-1), markRate*inx);
-		//$(".carousel-inner .item.active ." + target + " .object:eq(" + (survivoredObjPosArr[inx]-1) + ")").addClass("use");
-		//befSurvivoredObjPos = Number(survivoredObjPosArr[inx]);
+		markUseFnc(Number(survivoredObjPosArr[inx]-1), CONST.OLD.MARK_USE_RATE*(inx+1));
 	}
-	//markUseFnc(maxSize,markRate*survivoredObjPosArr.length,callback,survivoredObjPosArr );
+
+	var cmsMarkingFnc = function(posArr, timeout){
+		var _tf = setTimeout(function(){
+			cmsMarking(posArr);
+		},timeout);
+		timeoutList.push(_tf);
+	};
+	cmsMarkingFnc(survivoredObjPosArr,CONST.OLD.MARK_USE_RATE*(survivoredObjPosArr.length) );
+};
+
+function cmsMarking(posArr){
+	$("#full-gc-cms-01 div.app-state").text("Application is running and [Concurrent Marking] is proceeding.");
+	
+	edenAllocate();
+	
+	var instance = jsPlumb.getInstance({
+		//Connector:"Bezier",
+		Connector:"StateMachine",
+		//PaintStyle:{ lineWidth:3, strokeStyle:"#ffa500", "dashstyle":"2 4" },
+		PaintStyle:{ lineWidth:3, strokeStyle:"rgb(68, 85, 102)","dashstyle":"1 1" },
+		Endpoint:[ "Dot", { radius:2 } ]
+		//EndpointStyle:{ fillStyle:"#ffa500" }
+	});
+	var cmsMarkingFnc = function(obj, randPos, timeout){
+		var _tf=setTimeout(function(){
+			$(".carousel-inner .item.active .old .object:eq(" + (randPos-1) + ")").addClass("markuse").fadeTo('fast', 0.5).fadeTo('fast', 1.0);
+			instance.connect({
+				id:"mytest" + (randPos-1),
+				source: $(obj), 
+				target:$(".carousel-inner .item.active .old .object:eq(" + (randPos-1) + ")"), 
+				anchor:"AutoDefault",
+				overlays:[ 
+				          [ "PlainArrow", { width:10, length:7,location:1 } ] 
+				      ]
+			});
+		}, timeout );
+		
+		$("#mytest" + (randPos-1)).fadeOut("slow");
+		timeoutList.push(_tf);
+	};
+	var markUseIdx = 1;
+	$(".carousel-inner .item.active .old .object.markuse").each(function(){
+		var isDup = true;
+		var randPos = 0;
+		while(isDup){
+			isDup = false;
+			randPos = getRandomInt(1,CONST.OLD.CMS_SIZE);
+			for( var inx = 0 ; inx < posArr.length ; inx++ ){
+				if( posArr[inx] == randPos ) isDup = true;
+			}
+		}
+		if(getRandomInt(1,10) < 3) return;
+		cmsMarkingFnc($(this), randPos,CONST.OLD.MARK_USE_RATE*markUseIdx++ );
+	});
+	
+	var _tf=setTimeout(function(){
+		jsPlumb.reset();
+		$("#full-gc-cms-01 svg").remove();
+		$("#full-gc-cms-01 div._jsPlumb_endpoint").remove();
+	},CONST.OLD.MARK_USE_RATE*markUseIdx);
+	timeoutList.push(_tf);
 };
 
 function copyObjects(src, trg, posArr){
@@ -190,6 +245,15 @@ function minorGC_allocateS1ToS2Old(posArr){
 		copyObjects("s1", "old", posArr.slice(1,posArr.length));
 	}else{
 		copyObjects("s1", "old", posArr);
+	}
+};
+
+function minorGC_allocateS2ToS1Old(posArr){
+	if( posArr.length > 1 ){
+		copyObjects("s2", "s1", posArr.slice(0,1));
+		copyObjects("s2", "old", posArr.slice(1,posArr.length));
+	}else{
+		copyObjects("s2", "old", posArr);
 	}
 };
 
