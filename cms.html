@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Concurrent Mark-Sweep Garbage Collection</title>
+
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/full-slider.css" rel="stylesheet">
+    <link href="css/visual-gc.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+    
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="https://github.com/haks1999/haklab-gc">Visual GC</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="serial.html">Serial &amp; Parallel</a>
+                    </li>
+                    <li><a href="cms.html">CMS</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div id="myCarousel" class="carousel slide">
+        <ol class="carousel-indicators">
+            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+            <li data-target="#myCarousel" data-slide-to="1"></li>
+            <li data-target="#myCarousel" data-slide-to="2"></li>
+            <li data-target="#myCarousel" data-slide-to="3"></li>
+            <li data-target="#myCarousel" data-slide-to="4"></li>
+            <li data-target="#myCarousel" data-slide-to="5"></li>
+            <li data-target="#myCarousel" data-slide-to="6"></li>
+            <li data-target="#myCarousel" data-slide-to="7"></li>
+        </ol>
+
+        <div class="carousel-inner">
+        
+            <div id="initial-heap" class="item active">
+            
+                <div class="container top-buffer">
+
+                	<div class="row section">
+                		<div class="col-md-1"></div>
+                		
+                		<div class="figure col-md-5">
+                			<div class="heap">
+                				<div class="h-label">
+                					<span class="eden">Eden</span>
+                					<span class="s1">S1</span>
+                					<span class="s2">S2</span>
+                				</div>
+                				<div class="young">
+                					<div class="space eden">
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                					</div>
+                					<div class="space s1">
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                					</div>
+                					<div class="space s2">
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                						<div class="object empty"></div>
+                					</div>
+                				</div>
+                				<hr/>
+                				<div class="h-label">
+                					<div>Old Generation</div>
+                				</div>
+                				<div class="old">
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                					<div class="object empty"></div>
+                				</div>
+                			</div>
+                		</div>
+                		<div class="col-md-4">
+                			<div class="btn-group btn-group-sm">
+                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+							</div>
+                			<h3>The Layout of the heap</h3>
+							<ul>
+								<li><strong>The eden</strong> This is where most new objects are allocated (not all, as large objects may be allocated directly into the old generation). The eden is almost always empty after a minor garbage collection. </li>
+								<li><strong>The two survivor spaces (S1, S2)</strong> These hold objects that have survived at least one minor garbage collection.</li>
+								<li><strong>The Old generation</strong> Objects that are longer-lived are eventually promoted, or tenured, to the old generation.</li>
+							</ul>
+							<div class="well well-sm">
+      							The Application is not running.
+    						</div>
+                		</div>
+                		
+                	</div>
+				</div>
+            </div>
+            
+            <div id="eden-allocate" class="item">
+            	<div class="container top-buffer">
+                	<div class="row section">
+                		<div class="col-md-1"></div>
+                		<div class="figure col-md-5">
+                		</div>
+                		<div class="col-md-4">
+                			<div class="btn-group btn-group-sm">
+                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();edenAllocate();">
+  									<span class="glyphicon glyphicon-repeat"></span>
+								</button>
+        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+							</div>
+                			<h3>Eden Allocation
+							</h3>
+							<ul>
+								<li>Allocations into the eden by using what’s referred to as "the bump-the-pointer technique"</li>
+								<li>The end of the last allocated object is tracked, and when a new allocation request needs to be satisfied, the allocator needs only to check whether it will fit between top and the end of the eden. If it does, top is bumped to the end of the newly allocated object</li>
+							</ul>
+							<div class="well well-sm">
+      							The Application is running.
+    						</div>
+                			
+                		</div>
+                	</div>
+				</div>
+			</div>
+			
+            <div id="minor-gc-01" class="item">
+            	<div class="container top-buffer">
+                	<div class="row section">
+                		<div class="col-md-1"></div>
+                		<div class="figure col-md-5">
+                		</div>
+                		<div class="col-md-4">
+                			<div class="btn-group btn-group-sm">
+                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();minorGC01();">
+  									<span class="glyphicon glyphicon-repeat"></span>
+								</button>
+        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+							</div>
+                			<h3>Minor Garbage Collection 01
+							</h3>
+							<ol>
+								<li>Objects that have been found to be garbage are marked with a X.</li>
+								<li>Live objects in the eden that survive the collection are copied to the unused survivor space(S1).</li>
+								<li>Finally the eden is entirely empty</li>
+							</ol>
+							<div class="well well-sm">
+      							The Application is stopped for garbage collection.
+    						</div>
+                		</div>
+                	</div>
+				</div>
+            </div>
+            
+            <div id="minor-gc-02" class="item">
+            	<div class="container top-buffer">
+                	<div class="row section">
+                		<div class="col-md-1"></div>
+                		<div class="figure col-md-5">
+                		</div>
+                		<div class="col-md-4">
+                			<div class="btn-group btn-group-sm">
+                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();minorGC02();">
+  									<span class="glyphicon glyphicon-repeat"></span>
+								</button>
+        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+							</div>
+                			<h3>Minor Garbage Collection 02
+							</h3>
+							<ol>
+								<li>Objects that have been found in Eden and Survivor(S1) to be garbage are marked with a X.</li>
+								<li>Live objects in the eden that survive the collection are copied to the unused survivor space(S2).</li>
+								<li>Live objects in the survivor space that is in use, which will be given another chance to be reclaimed in the young generation, are also copied to the unused survivor space(S2).</li>
+								<li>At the end of the minor garbage collection, the two survivor spaces swap roles.</li>
+								<li>Finally the eden is entirely empty and only one survivor space is in use.</li>
+							</ol>
+							<div class="well well-sm">
+      							The Application is stopped for garbage collection.
+    						</div>
+                			
+                		</div>
+                	</div>
+				</div>
+            </div>
+            
+            <div id="minor-gc-03" class="item">
+            	<div class="container top-buffer">
+                	<div class="row section">
+                		<div class="col-md-1"></div>
+                		<div class="figure col-md-5">
+                		</div>
+                		<div class="col-md-4">
+                			<div class="btn-group btn-group-sm">
+                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();minorGC03();">
+  									<span class="glyphicon glyphicon-repeat"></span>
+								</button>
+        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+							</div>
+                			<h3>Minor Garbage Collection 03
+							</h3>
+							<ul>
+								<li>Same as before. just for checking swapped survivor spaces.</li>
+							</ul>
+							<div class="well well-sm">
+      							The Application is stopped for garbage collection.
+    						</div>
+                			
+                		</div>
+                	</div>
+				</div>
+            </div>
+            
+            <div id="minor-gc-04" class="item">
+            	<div class="container top-buffer">
+                	<div class="row section">
+                		<div class="col-md-1"></div>
+                		<div class="figure col-md-5">
+                		</div>
+                		<div class="col-md-4">
+                			<div class="btn-group btn-group-sm">
+                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();minorGC04();">
+  									<span class="glyphicon glyphicon-repeat"></span>
+								</button>
+        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+							</div>
+                			<h3>Minor Garbage Collection 04
+							</h3>
+							<ul>
+								<li>Live objects in the survivor space that is in use, that are deemed “old enough”, are promoted to the old generation.</li>
+								<li>During a minor garbage collection, there is no guarantee that the allocating survivor space will always be large enough to accommodate the surviving objects from both the eden and the other survivor space. If it overflows, the rest of the objects that need to be evacuated will be moved to the old generation. This is referred to as "premature promotion".</li>
+							</ul>
+							<div class="well well-sm">
+      							The Application is stopped for garbage collection.
+    						</div>
+                			
+                		</div>
+                	</div>
+				</div>
+            </div>
+            
+            <div id="full-gc-cms-01" class="item">
+            	<div class="container top-buffer">
+                	<div class="row section">
+                		<div class="col-md-1"></div>
+                		<div class="figure col-md-5">
+                		</div>
+                		<div class="col-md-4">
+                			<div class="btn-group btn-group-sm">
+                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();fullGC_CMS01();">
+  									<span class="glyphicon glyphicon-repeat"></span>
+								</button>
+        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+							</div>
+                			<h3>Full Garbage Collection
+							</h3>
+							<p>mark-compact garbage collector</p>
+							<ol>
+								<li>The mark-compact garbage collector first identifies which objects are still live in the old generation.</li>
+								<li>Then the collector slides live objects toward the beginning of the heap, leaving any free space in a single contiguous chunk at the end of the heap.</li>
+								<li>Future allocations into the old generation to use the fast bump-the-pointer technique.</li>
+							</ol>
+							<div class="well well-sm">
+      							The Application is stopped for garbage collection.
+    						</div>
+                			
+                		</div>
+                	</div>
+				</div>
+            </div>
+            
+            <div id="minor-gc-05" class="item">
+            	<div class="container top-buffer">
+                	<div class="row section">
+                		<div class="col-md-1"></div>
+                		<div class="figure col-md-5">
+                		</div>
+                		<div class="col-md-4">
+                			<div class="btn-group btn-group-sm">
+                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();minorGC05();">
+  									<span class="glyphicon glyphicon-repeat"></span>
+								</button>
+        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+							</div>
+                			<h3>Minor Garbage Collection 05
+							</h3>
+							<p>This is basic cycle of Serial Garbage collection.(same as Parallel Garbage collection but multithreaded collectors)</p>
+							<div class="well well-sm">
+      							The Application is stopped for garbage collection.
+    						</div>
+                			
+                		</div>
+                	</div>
+				</div>
+            </div>
+            
+        </div>
+
+        <!-- Controls -->
+       <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+            <span class="icon-prev"></span>
+        </a>
+        <a class="right carousel-control" href="#myCarousel" data-slide="next">
+            <span class="icon-next"></span>
+        </a>
+    </div>
+
+
+    <footer>
+    	<div class="container">
+        	<p>Created by <a href="mailto:haks1999@gmail.com">haks1999@gmail.com</a></p>
+        	<p> View on gitbub <a href="https://github.com/haks1999/haklab-gc">hakslab-gc</a></p>
+		</div>
+	</footer>
+
+
+    <!-- JavaScript -->
+   	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/visual-gc.js"></script>
+
+    <!-- Script to Activate the Carousel -->
+    <script>
+    $(function() {
+    	
+    	$(".carousel").carousel({
+            interval : false
+        });
+    	
+    	$(".carousel-inner button span.glyphicon-chevron-left").parent().click(function(){
+    		$(".carousel").carousel("prev");	
+    	});
+    	
+    	$(".carousel-inner button span.glyphicon-chevron-right").parent().click(function(){
+    		$(".carousel").carousel("next");	
+    	});
+    	
+    	initializeHeapLayout();
+    	// after change
+    	$('.carousel').on('slid.bs.carousel', function () {
+            var activeItemId = $(".carousel-inner div.active").attr("id");
+            if( activeItemId == "initial-heap"){
+            	initializeHeapLayout();
+            }else if( activeItemId == "eden-allocate" ){
+            	//$("#eden-allocate .eden .object").removeClass("empty").addClass("empty").css("display","");
+            	initializeHeapLayout({"eden-allocate":true});
+            	edenAllocate();
+            	
+            }else if( activeItemId == "minor-gc-01" ){
+            	initializeHeapLayout({"minor-gc-01":true});
+            	minorGC01();
+            	
+            }else if( activeItemId == "minor-gc-02" ){
+            	initializeHeapLayout({"minor-gc-02":true});
+            	minorGC02();
+            	
+            }else if( activeItemId == "minor-gc-03" ){
+            	initializeHeapLayout({"minor-gc-03":true});
+            	minorGC03();
+            	
+            }else if( activeItemId == "minor-gc-04" ){
+            	initializeHeapLayout({"minor-gc-04":true});            	
+            	minorGC04();
+            	
+            }else if( activeItemId == "full-gc-cms-01"){
+            	initializeHeapLayout({"full-gc-cms-01":true});
+            	fullGC_CMS01();
+            	
+            }else if( activeItemId == "minor-gc-05"){
+            	initializeHeapLayout({"minor-gc-05":true});            	
+            	minorGC05();
+            }
+        }); 
+    	
+	});
+    
+    	
+    /*
+    $('.carousel').carousel({
+        interval: 5000 //changes the speed
+    })
+    */
+    
+    
+    function initializeHeapLayout(exceptTargets){
+    	for (var inx = 0; inx < timeoutList.length; inx++) {
+    	    clearTimeout(timeoutList[inx]);
+    	}
+    	timeoutList = [];
+    	
+    	var _exceptTargets = exceptTargets || {};
+    	if( _exceptTargets["eden-allocate"]){
+    	}else{
+    		$("#eden-allocate .heap").remove();
+        	$("#eden-allocate .figure").append($("#initial-heap .heap").clone());    		
+    	}
+    	
+    	if( _exceptTargets["minor-gc-01"]){
+    	}else{
+    		$("#minor-gc-01 .heap").remove();
+        	$("#minor-gc-01 .figure").append($("#initial-heap .heap").clone());
+        	$("#minor-gc-01 .eden .object").removeClass("empty");	
+    	}
+    	
+    	if( _exceptTargets["minor-gc-02"]){
+    	}else{
+    		$("#minor-gc-02 .heap").remove();
+    		$("#minor-gc-02 .figure").append($("#initial-heap .heap").clone());
+    		$("#minor-gc-02 .eden .object").removeClass("empty");
+    		$("#minor-gc-02 .s1 .object").removeClass("empty");
+    	}
+    	
+    	if( _exceptTargets["minor-gc-03"]){
+    	}else{
+    		$("#minor-gc-03 .heap").remove();
+    		$("#minor-gc-03 .figure").append($("#initial-heap .heap").clone());
+    		$("#minor-gc-03 .eden .object").removeClass("empty");
+    		$("#minor-gc-03 .s2 .object").removeClass("empty");
+    	}
+    	
+    	if( _exceptTargets["minor-gc-04"]){
+    	}else{
+    		$("#minor-gc-04 .heap").remove();
+    		$("#minor-gc-04 .figure").append($("#initial-heap .heap").clone());
+    		$("#minor-gc-04 .eden .object").removeClass("empty");
+    		$("#minor-gc-04 .s1 .object").removeClass("empty");
+    	}
+    	
+    	if( _exceptTargets["full-gc-cms-01"]){
+    	}else{
+    		$("#full-gc-cms-01 .heap").remove();
+    		$("#full-gc-cms-01 .figure").append($("#initial-heap .heap").clone());
+    		$("#full-gc-cms-01 .eden .object").removeClass("empty");
+    		$("#full-gc-cms-01 .s2 .object").removeClass("empty");
+    		$("#full-gc-cms-01 .old .object").slice(0,30).removeClass("empty");
+    	}
+    	
+    	if( _exceptTargets["minor-gc-05"]){
+    	}else{
+    		$("#minor-gc-05 .heap").remove();
+    		$("#minor-gc-05 .figure").append($("#initial-heap .heap").clone());
+    		$("#minor-gc-05 .eden .object").removeClass("empty");
+    		$("#minor-gc-05 .s1 .object").removeClass("empty");
+    		$("#minor-gc-05 .old .object").slice(0,5).removeClass("empty");
+    	}
+    };
+    
+    </script>
+</body>
+
+
+</html>
