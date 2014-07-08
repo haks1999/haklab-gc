@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Serial &amp; Throughput Garbage Collection</title>
+    <title>Concurrent Mark-Sweep Garbage Collection</title>
 
     <link href="css/bootstrap.css" rel="stylesheet">
     <link href="css/full-slider.css" rel="stylesheet">
@@ -328,7 +328,7 @@
 				</div>
             </div>
             
-            <div id="full-gc-serial" class="item">
+            <div id="full-gc-cms" class="item">
             	<div class="container top-buffer">
                 	<div class="row section">
                 		<div class="col-md-1"></div>
@@ -337,21 +337,22 @@
                 		<div class="col-md-4">
                 			<div class="btn-group btn-group-sm">
                 				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
-								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();fullGC_Serial();">
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();fullGC_CMS();">
   									<span class="glyphicon glyphicon-repeat"></span>
 								</button>
         						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
 							</div>
-                			<h3>Full Garbage Collection
+                			<h3>Mostly-Concurrent GC
 							</h3>
-							<p>mark-compact garbage collector</p>
+							<p>Concurrent Mark-Sweep garbage coellection</p>
 							<ol>
-								<li>The mark-compact garbage collector first identifies which objects are still live in the old generation.</li>
-								<li>Then the collector slides live objects toward the beginning of the heap, leaving any free space in a single contiguous chunk at the end of the heap.</li>
-								<li>Future allocations into the old generation to use the fast bump-the-pointer technique.</li>
+								<li>It starts with a short pause, called the initial mark, that identifies the set of objects that are immediately reachable from outside the old generation.</li>
+								<li>Then, during the concurrent marking phase, it marks all live objects that are transitively reachable from this set.</li>
+								<li>Finally the application is stopped again for a second pause, called the remark pause, which finalizes the marking information by revisiting any objects that were modified during the concurrent marking phase.</li>
+								<li>Having identified all live objects in the old generation, the final phase of the garbage collection cycle is the concurrent sweeping phase, which sweeps over the Java heap, deallocating garbage objects without relocating the live ones.</li>
 							</ol>
-							<div class="well well-sm">
-      							The Application is stopped for garbage collection.
+							<div class="app-state well well-sm">
+      							The Application is stopped for [Initial Mark].
     						</div>
                 			
                 		</div>
@@ -375,7 +376,10 @@
 							</div>
                 			<h3>Minor Garbage Collection 05
 							</h3>
-							<p>This is basic cycle of Serial Garbage collection.(same as Parallel Garbage collection but multithreaded collectors)</p>
+							<ul>
+								<li>In this case, free space is not contiguous (unlike in the Serial or Parallel), and the garbage collector needs to employ a data structure (free lists, in the case of the HotSpot VM) that records which parts of the heap contain free space.</li>
+								<li>So, fragmentation issues due to the lack of compaction might also prevent the garbage collector from using all the available free space as efficiently as possible. If the old generation is full before the collection cycle in progress has actually reclaimed sufficient space, CMS reverts to an expensive stop-the-world compacting phase, similar to that of the Parallel and Serial GCs.</li>
+							</ul>
 							<div class="well well-sm">
       							The Application is stopped for garbage collection.
     						</div>
@@ -410,6 +414,7 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script src="js/bootstrap.js"></script>
     <script src="js/visual-gc.js"></script>
+    <script src="js/jquery.jsPlumb-1.6.2-min.js "></script>
 
     <!-- Script to Activate the Carousel -->
     <script>
@@ -426,8 +431,6 @@
     	$(".carousel-inner button span.glyphicon-chevron-right").parent().click(function(){
     		$(".carousel").carousel("next");	
     	});
-    	
-		
     	
     	initializeHeapLayout();
     	// after change
@@ -456,9 +459,9 @@
             	initializeHeapLayout({"minor-gc-04":true});            	
             	minorGC04();
             	
-            }else if( activeItemId == "full-gc-serial"){
-            	initializeHeapLayout({"full-gc-serial":true});
-            	fullGC_Serial();
+            }else if( activeItemId == "full-gc-cms"){
+            	initializeHeapLayout({"full-gc-cms":true});
+            	fullGC_CMS();
             	
             }else if( activeItemId == "minor-gc-05"){
             	initializeHeapLayout({"minor-gc-05":true});            	
@@ -520,13 +523,17 @@
     		$("#minor-gc-04 .s1 .object").removeClass("empty");
     	}
     	
-    	if( _exceptTargets["full-gc-serial"]){
+    	if( _exceptTargets["full-gc-cms"]){
     	}else{
-    		$("#full-gc-serial .heap").remove();
-    		$("#full-gc-serial .figure").append($("#initial-heap .heap").clone());
-    		$("#full-gc-serial .eden .object").removeClass("empty");
-    		$("#full-gc-serial .s2 .object").removeClass("empty");
-    		$("#full-gc-serial .old .object").removeClass("empty");
+    		jsPlumb.reset();
+    		$("#full-gc-cms div.app-state").text("The Application is stopped for [Initial Mark].");
+    		$("#full-gc-cms svg").remove();
+    		$("#full-gc-cms div._jsPlumb_endpoint").remove();
+    		$("#full-gc-cms .heap").remove();
+    		$("#full-gc-cms .figure").append($("#initial-heap .heap").clone());
+    		$("#full-gc-cms .eden .object").slice(0,8).removeClass("empty");
+    		$("#full-gc-cms .s2 .object").slice(0,5).removeClass("empty");
+    		$("#full-gc-cms .old .object").slice(0,30).removeClass("empty");
     	}
     	
     	if( _exceptTargets["minor-gc-05"]){
@@ -535,7 +542,12 @@
     		$("#minor-gc-05 .figure").append($("#initial-heap .heap").clone());
     		$("#minor-gc-05 .eden .object").removeClass("empty");
     		$("#minor-gc-05 .s1 .object").removeClass("empty");
-    		$("#minor-gc-05 .old .object").slice(0,5).removeClass("empty");
+    		$("#minor-gc-05 .old .object").slice(0,getRandomInt(1,4)).removeClass("empty");
+    		$("#minor-gc-05 .old .object").slice(getRandomInt(6,9),getRandomInt(10,11)).removeClass("empty");
+    		$("#minor-gc-05 .old .object").slice(getRandomInt(13,15),getRandomInt(17,21)).removeClass("empty");
+    		$("#minor-gc-05 .old .object").slice(getRandomInt(27,29),getRandomInt(30,31)).removeClass("empty");
+    		$("#minor-gc-05 .old .object").slice(getRandomInt(34,35),getRandomInt(36,38)).removeClass("empty");
+    		$("#minor-gc-05 .old .object.empty").css("display","block").css("visibility","hidden");
     	}
     };
     

@@ -1,0 +1,73 @@
+.top-buffer { margin-top:100px; }
+    	.heap {
+    		width:375px;border-radius:5px;background-color:#555;padding:10px;
+    	}
+    	.heap .young{
+    		height:150px;
+    	}
+    	.heap .young .space, .heap .old{
+    		border-radius:5px;
+    	}
+    	.heap .young .space{
+    		height:145px;float:left;
+    	}
+    	.heap .young .eden {
+    		width:180px;background-color:#5bc0de;
+    	}
+    	.heap .young .s1 {
+    		width:75px;background-color:#5bc0de;margin-left:12px;
+    	}
+    	.heap .young .s2 {
+    		width:75px;background-color:#5bc0de;margin-left:12px;
+    	}
+    	.heap .old {
+    		height:145px;background-color:#428bca;
+    	}
+    	.heap .object{
+    		width:30px;height:30px;background-color:#f0ad4e;margin-left:5px;margin-top:5px;float:left;border-radius:10px;border:3px solid #555;
+    		
+    	}
+    	.heap .object.notuse{
+    		border-style:dotted; font-size: 15px;font-weight: bold;color:#555;line-height:0px;padding: 5px 2px; 
+    	}
+    	.heap .object.notuse:before{
+    		content:"x";
+    	}
+    	.heap .object.markuse{
+    		background-image: radial-gradient(circle at center, #d9534f 4px, transparent 5px);
+    		background-size: 15px 15px;
+    		background-position: top left;
+    		background-repeat: no-repeat;
+    	}
+    	.heap .young .object.copying{
+    		background-color:#5bc0de;border-style:dotted;
+    	}
+    	.heap .old .object.copying{
+    		background-color:#428bca;border-style:dotted;
+    	}
+    	.heap .object.empty{
+    		display:none;
+    	}
+    	.heap .h-label{
+    		color:#eee;font-weight:bold;
+    	}
+    	.heap .h-label span{
+    		text-align:center;display:inline-block;
+    	}
+    	.heap .h-label div{
+    		text-align:center;
+    	}
+    	.heap .h-label .eden {
+    		width:180px;
+    	}
+    	.heap .h-label .s1 {
+    		width:70px;margin-left:10px;
+    	}
+    	.heap .h-label .s2 {
+    		width:70px;margin-left:10px;
+    	}
+
+   		footer{
+   			padding-top: 40px;padding-bottom: 40px;margin-top: 100px;color: #777;text-align: center;border-top: 1px solid #e5e5e5;
+   		}
+   	
