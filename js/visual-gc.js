@@ -66,7 +66,7 @@ function fullGC_Serial(){
 	markNotuse("old",fullGC_compactAndSweep);
 };
 
-function fullGC_CMS01(){
+function fullGC_CMS(){
 	cmsPauseMarking(cmsConcurrentMarking);
 };
 
@@ -127,6 +127,7 @@ function cmsPauseMarking(callback){
 	
 	var markUseFnc = function(survivoredObjPos, timeout){
 		var _tf=setTimeout(function(){
+			if($(".carousel-inner .item.active .old .object:eq(" + survivoredObjPos + ")").hasClass("markuse")) return;
 			$(".carousel-inner .item.active .old .object:eq(" + survivoredObjPos + ")").addClass("markuse").fadeTo('fast', 0.5).fadeTo('fast', 1.0);
 		},timeout);
 		timeoutList.push(_tf);
@@ -140,7 +141,6 @@ function cmsPauseMarking(callback){
 	var cmsMarkingFnc = function(posArr, timeout, callbackFnc){
 		var _tf = setTimeout(function(){
 			callbackFnc.call(null, posArr);	
-			//cmsConcurrentMarking(posArr);
 		},timeout);
 		timeoutList.push(_tf);
 	};
@@ -148,7 +148,7 @@ function cmsPauseMarking(callback){
 };
 
 function cmsConcurrentMarking(posArr){
-	$("#full-gc-cms-01 div.app-state").text("Application is running and [Concurrent Marking] is proceeding.");
+	$("#full-gc-cms div.app-state").text("Application is running and [Concurrent Marking] is proceeding.");
 	
 	edenAllocate();
 	
@@ -193,49 +193,38 @@ function cmsConcurrentMarking(posArr){
 	
 	var _tfClear=setTimeout(function(){
 		jsPlumb.reset();
-		$("#full-gc-cms-01 svg").remove();
-		$("#full-gc-cms-01 div._jsPlumb_endpoint").remove();
+		$("#full-gc-cms svg").remove();
+		$("#full-gc-cms div._jsPlumb_endpoint").remove();
 	},CONST.OLD.MARK_USE_RATE*markUseIdx++);
 	timeoutList.push(_tfClear);
 	
 	var _tfRemark=setTimeout(function(){
-		$("#full-gc-cms-01 div.app-state").text("The Application is stopped for [Remark].");
-		cmsPauseMarking();
-	},CONST.OLD.MARK_USE_RATE*markUseIdx);
+		$("#full-gc-cms div.app-state").text("The Application is stopped for [Remark & Sweeping].");
+		cmsPauseMarking(cmsSweeping);
+	},CONST.OLD.MARK_USE_RATE*++markUseIdx);
 	timeoutList.push(_tfRemark);
 };
 
 function cmsSweeping(){
 	
-	var sweepFnc = function(sweepStartPos, sweepEndPos, timeout){
+	var cmsSweepingFnc = function(obj, timeout){
 		var _tf=setTimeout(function(){
-			$(".carousel-inner .item.active .old .object").slice(sweepStartPos,sweepEndPos).addClass("copying");
-		},timeout);
+			$(obj).addClass("copying").fadeTo("fast" , 0.1, function() {
+			    $(this).css("visibility","hidden");
+			  });
+		}, timeout );
 		timeoutList.push(_tf);
 	};
 	
-	var befPos = 0;
-	var posIdx = 0;
-	var delTimer = 1;
-	$(".carousel-inner .item.active .old .object").each(function(){
-		if($(this).hasClass("use")){
-			sweepFnc(befPos,posIdx,CONST.OLD.DEL_RATE*delTimer++);
-			befPos = posIdx+1;
-		}
-		posIdx++;
+	var markNotuseIdx = 1;
+	$(".carousel-inner .item.active .old .object").not(".markuse").not(".empty").each(function(){
+		cmsSweepingFnc($(this), CONST.OLD.DEL_RATE*markNotuseIdx++ );
 	});
-	sweepFnc(befPos,posIdx,CONST.OLD.DEL_RATE*delTimer++);
-	
-	var befPos = 0;
-	var posIdx = 0;
-	$(".carousel-inner .item.active .old .object").each(function(){
-		if($(this).hasClass("use")){
-			sweepFnc(befPos,posIdx,CONST.OLD.DEL_RATE*delTimer++,true);
-			befPos = posIdx+1;
-		}
-		posIdx++;
-	});
-	sweepFnc(befPos,posIdx,CONST.OLD.DEL_RATE*delTimer++,true);
+	var _tfResetDirty=setTimeout(function(){
+		$(".carousel-inner .item.active .old .object.markuse").removeClass("markuse");
+	},CONST.OLD.DEL_RATE*++markNotuseIdx);
+	timeoutList.push(_tfResetDirty);
+
 };
 
 function copyObjects(src, trg, posArr){
