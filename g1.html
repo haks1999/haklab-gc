@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Concurrent Mark-Sweep Garbage Collection</title>
+    <title>Garbage-First Garbage Collection</title>
 
     <link href="css/bootstrap.css" rel="stylesheet">
     <link href="css/full-slider.css" rel="stylesheet">
@@ -62,102 +62,92 @@
                 		<div class="col-md-1"></div>
                 		
                 		<div class="figure col-md-5">
-                			<div class="heap">
+                			<div class="cheap">
                 				<div class="h-label">
-                					<span class="eden">Eden</span>
-                					<span class="s1">S1</span>
-                					<span class="s2">S2</span>
+                					<span class="eden">Contiguous Heap</span>
                 				</div>
-                				<div class="young">
-                					<div class="space eden">
+                				<div class="space">
+                						<div class="object "></div>
+                						<div class="object empty"></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object empty"></div>
+                						<div class="object eden"></div>
+                						<div class="object eden"></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object old"></div>
+                						<div class="object survivor"></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object eden"></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object empty"></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object empty"></div>
+                						<div class="object eden"></div>
                 						<div class="object empty"></div>
                 						<div class="object empty"></div>
                 						<div class="object empty"></div>
                 						<div class="object empty"></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object eden"></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
                 						<div class="object empty"></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
                 						<div class="object empty"></div>
+                						<div class="object "></div>
                 						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
+                						<div class="object "></div>
                 					</div>
-                					<div class="space s1">
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                					</div>
-                					<div class="space s2">
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                						<div class="object empty"></div>
-                					</div>
-                				</div>
-                				<hr/>
-                				<div class="h-label">
-                					<div>Old Generation</div>
-                				</div>
-                				<div class="old">
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                					<div class="object empty"></div>
-                				</div>
                 			</div>
                 		</div>
                 		<div class="col-md-4">
@@ -419,10 +409,12 @@
     <script>
     $(function() {
     	
+    	
     	$(".carousel").carousel({
             interval : false
         });
     	
+    	/*
     	$(".carousel-inner button span.glyphicon-chevron-left").parent().click(function(){
     		$(".carousel").carousel("prev");	
     	});
@@ -432,7 +424,6 @@
     	});
     	
     	initializeHeapLayout();
-    	// after change
     	$('.carousel').on('slid.bs.carousel', function () {
             var activeItemId = $(".carousel-inner div.active").attr("id");
             if( activeItemId == "initial-heap"){
@@ -467,15 +458,8 @@
             	minorGC05();
             }
         }); 
-    	
+    	*/
 	});
-    
-    	
-    /*
-    $('.carousel').carousel({
-        interval: 5000 //changes the speed
-    })
-    */
     
     
     function initializeHeapLayout(exceptTargets){

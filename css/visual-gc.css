@@ -45,9 +45,10 @@
     	.heap .old .object.copying{
     		background-color:#428bca;border-style:dotted;
     	}
-    	.heap .object.empty{
+    	.heap .young .object.empty,.heap .old .object.empty{
     		display:none;
     	}
+    	
     	.heap .h-label{
     		color:#eee;font-weight:bold;
     	}
@@ -65,6 +66,35 @@
     	}
     	.heap .h-label .s2 {
     		width:70px;margin-left:10px;
+    	}
+    	
+    	.cheap {
+    		height:325px;width:375px;border-radius:5px;background-color:#555;padding:10px;
+    	}
+    	.cheap .h-label{
+    		color:#eee;font-weight:bold;
+    	}
+    	.cheap .h-label span{
+    		text-align:center;display:inline-block;width:100%;
+    	}
+    	.cheap .object{
+    		width:30px;height:30px;background-color:#f0ad4e;margin-left:5px;margin-top:5px;float:left;border-radius:5px;border:2px solid #f0ad4e;
+    		
+    	}
+    	.cheap .object.eden{
+    		background-color:#5bc0de;border:2px solid #5bc0de;
+    		
+    	}
+    	.cheap .object.survivor{
+    		background-color:#428bca;border:2px solid #428bca;
+    		
+    	}
+    	.cheap .object.old{
+    		background-color:#f0ad4e;border:2px solid #f0ad4e;
+    		
+    	}
+    	.cheap .object.empty{
+    		background-color:#555;border:2px dotted #777;
     	}
 
    		footer{
