@@ -69,7 +69,10 @@
     	}
     	
     	.cheap {
-    		height:325px;width:375px;border-radius:5px;background-color:#555;padding:10px;
+    		width:375px;border-radius:5px;background-color:#555;padding:10px;
+    	}
+    	.cheap .space{
+    		height:290px;
     	}
     	.cheap .h-label{
     		color:#eee;font-weight:bold;
@@ -96,7 +99,16 @@
     	.cheap .object.empty{
     		background-color:#555;border:2px dotted #777;
     	}
-
+    	.cheap .legend{
+    		height:20px;color:#eee;margin-left:30px;
+    	}
+		.cheap .legend .object{
+    		width:15px;height:15px;margin-left:15px;
+    	}
+    	.cheap .legend .title{
+    		float:left;margin-top:2px;margin-left:3px;
+    	}
+	
    		footer{
    			padding-top: 40px;padding-bottom: 40px;margin-top: 100px;color: #777;text-align: center;border-top: 1px solid #e5e5e5;
    		}

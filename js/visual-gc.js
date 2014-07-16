@@ -323,6 +323,32 @@ function fullGC_compactAndSweep(posArr){
 };
 
 
+function edenAllocateG1(args){
+	var targetElem = args.target?("#"+args.target):".carousel-inner .item.active";
+	var allocateFnc = function( allocatePos, timeout ){
+		var _tf = setTimeout(function(){
+			$(targetElem + " .space .object:eq(" + allocatePos + ")").removeClass("empty").addClass("eden").fadeTo('fast', 0.5).fadeTo('fast', 1.0);        			
+		},timeout);
+		timeoutList.push(_tf);
+	}
+	var allocateLimit = $(targetElem + " .space .object.empty").length;
+	var currentPos = 0;
+	var timerCnt = 1;
+	while( currentPos < allocateLimit ){
+		currentPos += getRandomInt(1,10);
+		if(args.useTimer){
+			allocateFnc(currentPos, CONST.EDEN.LOC_RATE*timerCnt++);
+		}else{
+			$(targetElem + " .space .object:eq(" + currentPos + ")").removeClass("empty").addClass("eden");
+		}
+		
+	}
+};
+
+function G1_allocateEdenToS1(){
+	
+};
+
 
 
 function getStartingOffset(){
