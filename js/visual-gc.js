@@ -17,6 +17,12 @@ var CONST = {
     			MARK_RATE : 400,
     			DEL_RATE : 400,
     			MARK_USE_RATE : 700
+    		},
+    		G1:{
+    			LOC_RATE:400,
+    			COPY_SPD:1200,
+    			MARK_RATE:300,
+    			CON_MARK_RATE : 700
     		}
     	};
 
@@ -228,7 +234,7 @@ function cmsSweeping(){
 };
 
 function copyObjects(src, trg, posArr){
-	var startingPos = getStartingOffset();
+	var startingPos = getStartingOffset({target:".carousel-inner .item.active .heap"});
 	
 	var movingPosToArr = [];
 	$(".carousel-inner .item.active ." + trg + " .object.empty:not(.copying)").slice(0, posArr.length).removeClass("empty").addClass("copying _" + src );
@@ -322,12 +328,13 @@ function fullGC_compactAndSweep(posArr){
 	sweepFnc(befPos,posIdx,CONST.OLD.DEL_RATE*delTimer++,true);
 };
 
-
-function edenAllocateG1(args){
+function allocateG1(args){
 	var targetElem = args.target?("#"+args.target):".carousel-inner .item.active";
+	var targetSpace = args.space?args.space:"eden";
+	var density = args.density?args.density:8;
 	var allocateFnc = function( allocatePos, timeout ){
 		var _tf = setTimeout(function(){
-			$(targetElem + " .space .object:eq(" + allocatePos + ")").removeClass("empty").addClass("eden").fadeTo('fast', 0.5).fadeTo('fast', 1.0);        			
+			$(targetElem + " .space .object.empty:eq(" + allocatePos + ")").switchClass("empty",targetSpace,400);
 		},timeout);
 		timeoutList.push(_tf);
 	}
@@ -335,24 +342,159 @@ function edenAllocateG1(args){
 	var currentPos = 0;
 	var timerCnt = 1;
 	while( currentPos < allocateLimit ){
-		currentPos += getRandomInt(1,10);
+		currentPos += getRandomInt(1,density);
 		if(args.useTimer){
-			allocateFnc(currentPos, CONST.EDEN.LOC_RATE*timerCnt++);
+			allocateFnc(currentPos, CONST.G1.LOC_RATE*timerCnt++);
 		}else{
-			$(targetElem + " .space .object:eq(" + currentPos + ")").removeClass("empty").addClass("eden");
+			$(targetElem + " .space .object.empty:eq(" + currentPos + ")").removeClass("empty").addClass(targetSpace);
 		}
 		
 	}
 };
 
-function G1_allocateEdenToS1(){
+function copyObjectsG1(args){
+	var startingPos = getStartingOffset({target:".carousel-inner .item.active .cheap"});
 	
+	var switchObjFnc = function(targetObj, target, timeout){
+		var _tf = setTimeout(function(){
+			//$(targetObj).switchClass("empty " + target, target,400);//.removeClass("empty " + target).addClass(target);
+			$(targetObj).removeClass("empty " + target).addClass(target);
+		},timeout);
+		timeoutList.push(_tf);
+	}
+	
+	$(".carousel-inner .item.active .space .object." + args.src).each(function(){
+		if( getRandomInt(1,10) > 5 ){
+			$(this).switchClass(args.src,"empty",1000);
+			return;
+		}
+		var targetObjIdx = getRandomInt(1,$(".carousel-inner .item.active .space .object.empty").length-1);
+		var targetObj = $(".carousel-inner .item.active .space .object.empty:eq(" + targetObjIdx + ")");
+		var targetObjOffset = $(targetObj).offset();
+		
+		var position = $(this).offset();
+		var copyingObj = $(this).clone();
+		if( $(this).hasClass("empty")) return;
+		$(this).addClass("empty").removeClass(args.src);
+		$(copyingObj).css("position","absolute").css("left",position.left-startingPos.left).css("top", position.top-startingPos.top).appendTo($(".carousel-inner .item.active .cheap"));
+		$(copyingObj).animate({left:targetObjOffset.left-startingPos.left,top:targetObjOffset.top-startingPos.top},CONST.G1.COPY_SPD,function(){
+			switchObjFnc($(targetObj), args.trg, 1);
+			//if( args.src == args.trg ) return;
+			$(this).fadeOut("fast",function(){
+				$(this).remove();
+			});
+		});    		
+	});
 };
 
+function initialMarkingG1(){
+	copyObjectsG1({src:"survivor",trg:"old"});
+	copyObjectsG1({src:"eden",trg:"survivor"});
+	
+	var markUseFnc = function(targetObj, timeout){
+		var _tf=setTimeout(function(){
+			$(targetObj).addClass("markuse").fadeTo('fast', 0.8).fadeTo('fast', 1.0);;
+		},timeout);
+		timeoutList.push(_tf);
+	};
+	
+	var timerIdx = 1;
+	$(".carousel-inner .item.active .space .object.old").each(function(){
+		if( getRandomInt(1,10) > 3 ){
+			return;
+		}
+		markUseFnc($(this),CONST.G1.MARK_RATE*timerIdx++);
+	});
+	
+	var _tf=setTimeout(function(){
+		concurrentMarkingG1();
+	},CONST.G1.MARK_RATE*(timerIdx+3));
+	timeoutList.push(_tf);
+};
 
+function concurrentMarkingG1(){
+	$("#full-gc-g1 div.app-state").text("Application is running and [Concurrent Marking] is proceeding.");
+	allocateG1({useTimer:true});
+	
+	var instance = jsPlumb.getInstance({
+		Connector:"StateMachine",
+		PaintStyle:{ lineWidth:3, strokeStyle:"#eee","dashstyle":"1 1" },
+		Endpoint:[ "Dot", { radius:2 } ]
+	});
+	var conMarkUseFnc = function(srcObj, trgObj, timeout){
+		var _tf=setTimeout(function(){
+			instance.connect({
+				source: $(srcObj), 
+				target: $(trgObj),
+				anchor:"AutoDefault",
+				overlays:[ 
+				          [ "PlainArrow", { width:10, length:7,location:1 } ] 
+				      ]
+			});
+			$(trgObj).addClass("markuse").fadeTo('fast', 0.8).fadeTo('fast', 1.0);;
+		}, timeout );
+		timeoutList.push(_tf);
+	};
+	var timerIdx = 1;
+	var unmarkedOldObjSize = $(".carousel-inner .item.active .space .object.old").not(".markuse").length;
+	$(".carousel-inner .item.active .space .object.survivor").each(function(){
+		var targetOldObj = $(".carousel-inner .item.active .space .object.old:not(.markuse):eq(" + getRandomInt(1,unmarkedOldObjSize) + ")");
+		conMarkUseFnc($(this),$(targetOldObj), CONST.G1.CON_MARK_RATE*timerIdx++);
+	});
+	
+	var _tfClear=setTimeout(function(){
+		jsPlumb.reset();
+		$("#full-gc-g1 svg").remove();
+		$("#full-gc-g1 div._jsPlumb_endpoint").remove();
+	},CONST.G1.CON_MARK_RATE*timerIdx++);
+	timeoutList.push(_tfClear);
+	
+	var _tfRemark=setTimeout(function(){
+		remarkG1();
+	},CONST.G1.CON_MARK_RATE*(timerIdx+2));
+	timeoutList.push(_tfRemark);
+};
 
-function getStartingOffset(){
-	var _offset = $(".carousel-inner .item.active .heap").offset();
+function remarkG1(){
+	$("#full-gc-g1 div.app-state").text("The Application is stopped for [Remark]");
+	
+	var markUseFnc = function(targetObj, timeout){
+		var _tf=setTimeout(function(){
+			$(targetObj).addClass("markuse").fadeTo('fast', 0.8).fadeTo('fast', 1.0);;
+		},timeout);
+		timeoutList.push(_tf);
+	};
+	
+	var timerIdx = 1;
+	$(".carousel-inner .item.active .space .object.old:not(.markuse)").each(function(){
+		if( getRandomInt(1,10) > 2 ){
+			return;
+		}
+		markUseFnc($(this),CONST.G1.MARK_RATE*timerIdx++);
+	});
+	
+	var _tf=setTimeout(function(){
+		remarkAndRemoveG1();
+	},CONST.G1.MARK_RATE*timerIdx++);
+	timeoutList.push(_tf);
+};
+
+function remarkAndRemoveG1(){
+	var removeFnc = function(targetObj, timeout){
+		var _tf=setTimeout(function(){
+			$(targetObj).switchClass("old","empty",400);
+		},timeout);
+		timeoutList.push(_tf);
+	};
+	
+	var timerIdx = 1;
+	$(".carousel-inner .item.active .space .object.old:not(.markuse)").each(function(){
+		removeFnc($(this),CONST.G1.MARK_RATE*timerIdx++);
+	});
+};
+
+function getStartingOffset(args){
+	var _offset = $(args.target).offset();
 	return {left:Number(_offset.left)-10, top: Number(_offset.top)+5};
 };
 

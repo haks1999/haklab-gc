@@ -186,7 +186,7 @@
                 		<div class="col-md-4">
                 			<div class="btn-group btn-group-sm">
                 				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
-								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();edenAllocateG1({useTimer:true});">
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();allocateG1({useTimer:true});">
   									<span class="glyphicon glyphicon-repeat"></span>
 								</button>
         						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
@@ -215,7 +215,7 @@
                 		<div class="col-md-4">
                 			<div class="btn-group btn-group-sm">
                 				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
-								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();minorGCG101();">
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();copyObjectsG1({src:'eden',trg:'survivor'});">
   									<span class="glyphicon glyphicon-repeat"></span>
 								</button>
         						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
@@ -235,7 +235,7 @@
 				</div>
             </div>
             
-            <div id="minor-gc-02" class="item">
+            <div id="minor-gc-g1-02" class="item">
             	<div class="container top-buffer">
                 	<div class="row section">
                 		<div class="col-md-1"></div>
@@ -244,7 +244,7 @@
                 		<div class="col-md-4">
                 			<div class="btn-group btn-group-sm">
                 				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
-								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();minorGC02();">
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();copyObjectsG1({src:'survivor',trg:'survivor'});copyObjectsG1({src:'eden',trg:'survivor'});">
   									<span class="glyphicon glyphicon-repeat"></span>
 								</button>
         						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
@@ -267,7 +267,7 @@
 				</div>
             </div>
             
-            <div id="minor-gc-03" class="item">
+            <div id="minor-gc-g1-03" class="item">
             	<div class="container top-buffer">
                 	<div class="row section">
                 		<div class="col-md-1"></div>
@@ -276,7 +276,7 @@
                 		<div class="col-md-4">
                 			<div class="btn-group btn-group-sm">
                 				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
-								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();minorGC03();">
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();copyObjectsG1({src:'survivor',trg:'old'});copyObjectsG1({src:'eden',trg:'survivor'});">
   									<span class="glyphicon glyphicon-repeat"></span>
 								</button>
         						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
@@ -295,7 +295,7 @@
 				</div>
             </div>
             
-            <div id="minor-gc-04" class="item">
+            <div id="full-gc-g1" class="item">
             	<div class="container top-buffer">
                 	<div class="row section">
                 		<div class="col-md-1"></div>
@@ -304,48 +304,19 @@
                 		<div class="col-md-4">
                 			<div class="btn-group btn-group-sm">
                 				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
-								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();minorGC04();">
+								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();initialMarkingG1();">
   									<span class="glyphicon glyphicon-repeat"></span>
 								</button>
         						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
 							</div>
-                			<h3>Minor Garbage Collection 04
+                			<h3>G1 Collection
 							</h3>
-							<ul>
-								<li>Live objects in the survivor space that is in use, that are deemed “old enough”, are promoted to the old generation.</li>
-								<li>During a minor garbage collection, there is no guarantee that the allocating survivor space will always be large enough to accommodate the surviving objects from both the eden and the other survivor space. If it overflows, the rest of the objects that need to be evacuated will be moved to the old generation. This is referred to as "premature promotion".</li>
-							</ul>
-							<div class="well well-sm">
-      							The Application is stopped for garbage collection.
-    						</div>
-                			
-                		</div>
-                	</div>
-				</div>
-            </div>
-            
-            <div id="full-gc-cms" class="item">
-            	<div class="container top-buffer">
-                	<div class="row section">
-                		<div class="col-md-1"></div>
-                		<div class="figure col-md-5">
-                		</div>
-                		<div class="col-md-4">
-                			<div class="btn-group btn-group-sm">
-                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
-								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();fullGC_CMS();">
-  									<span class="glyphicon glyphicon-repeat"></span>
-								</button>
-        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
-							</div>
-                			<h3>Mostly-Concurrent GC
-							</h3>
-							<p>Concurrent Mark-Sweep garbage coellection</p>
+							<p>Concurrent Marking Cycle Phases</p>
 							<ol>
-								<li>It starts with a short pause, called the initial mark, that identifies the set of objects that are immediately reachable from outside the old generation.</li>
-								<li>Then, during the concurrent marking phase, it marks all live objects that are transitively reachable from this set.</li>
-								<li>Finally the application is stopped again for a second pause, called the remark pause, which finalizes the marking information by revisiting any objects that were modified during the concurrent marking phase.</li>
-								<li>Having identified all live objects in the old generation, the final phase of the garbage collection cycle is the concurrent sweeping phase, which sweeps over the Java heap, deallocating garbage objects without relocating the live ones.</li>
+								<li>The old generation collection starts with the Initial Marking phase and it is piggybacked on young generation collection.</li>
+								<li>In the Concurrent Marking phase liveness information per region is determined while the application is running. Live objects are found over the entire heap. This activity may get interrupted by young generation collections. Any empty regions found is removed immediately in the Remark phase.</li>
+								<li>The Remark phase completes the marking of live objects in the heap. G1 collector uses an algorithm called snapshot-at-the-beginning (SATB) which is much faster than what is used in the CMS collector. Empty regions are removed and reclaimed.</li>
+								<li>In the Copying/Cleanup phase, G1 selects the regions with the low “liveness”. These regions can be collected fastest and this cleanup happens at the same time as a young GC. So both young and old generations are collected at the same time.</li>
 							</ol>
 							<div class="app-state well well-sm">
       							The Application is stopped for [Initial Mark].
@@ -415,8 +386,6 @@
     <!-- Script to Activate the Carousel -->
     <script>
     $(function() {
-    	
-    	
     	$(".carousel").carousel({
             interval : false
         });
@@ -438,11 +407,27 @@
             	
             }else if( activeItemId == "eden-allocate-g1" ){
             	initializeHeapLayout({"eden-allocate-g1":true});
-            	edenAllocateG1({useTimer:true});
+            	allocateG1({useTimer:true});
             	
             }else if( activeItemId == "minor-gc-g1-01" ){
             	initializeHeapLayout({"minor-gc-g1-01":true});
-            	//edenAllocateG1({useTimer:true});
+            	copyObjectsG1({src:"eden",trg:"survivor"});
+            	
+            }else if( activeItemId == "minor-gc-g1-02" ){
+            	initializeHeapLayout({"minor-gc-g1-02":true});
+            	copyObjectsG1({src:"survivor",trg:"survivor"});
+            	copyObjectsG1({src:"eden",trg:"survivor"});
+            	
+            }else if( activeItemId == "minor-gc-g1-03" ){
+            	initializeHeapLayout({"minor-gc-g1-03":true});
+            	copyObjectsG1({src:"survivor",trg:"old"});
+            	copyObjectsG1({src:"eden",trg:"survivor"});
+            	
+            }else if( activeItemId == "full-gc-g1" ){
+            	initializeHeapLayout({"full-gc-g1":true});
+            	initialMarkingG1();
+            	//copyObjectsG1({src:"survivor",trg:"old"});
+            	//copyObjectsG1({src:"eden",trg:"survivor"});
             	
             }
         }); 
@@ -470,10 +455,39 @@
     		var clonedInitHeap = $("#initial-heap .cheap").clone();
     		$(clonedInitHeap).find(".space .object").removeClass("old eden survivor").addClass("empty");
         	$("#minor-gc-g1-01 .figure").append($(clonedInitHeap));
-        	edenAllocateG1({target:"minor-gc-g1-01",useTimer:false});
+        	allocateG1({target:"minor-gc-g1-01",useTimer:false});
     	}
     	
+    	if( _exceptTargets["minor-gc-g1-02"]){
+    	}else{
+    		$("#minor-gc-g1-02 .cheap").remove();
+    		var clonedInitHeap = $("#initial-heap .cheap").clone();
+    		$(clonedInitHeap).find(".space .object").removeClass("old eden survivor").addClass("empty");
+        	$("#minor-gc-g1-02 .figure").append($(clonedInitHeap));
+        	allocateG1({target:"minor-gc-g1-02",useTimer:false,space:"eden"});
+        	allocateG1({target:"minor-gc-g1-02",useTimer:false,space:"survivor"});
+    	}
     	
+    	if( _exceptTargets["minor-gc-g1-03"]){
+    	}else{
+    		$("#minor-gc-g1-03 .cheap").remove();
+    		var clonedInitHeap = $("#initial-heap .cheap").clone();
+    		$(clonedInitHeap).find(".space .object").removeClass("old eden survivor").addClass("empty");
+        	$("#minor-gc-g1-03 .figure").append($(clonedInitHeap));
+        	allocateG1({target:"minor-gc-g1-03",useTimer:false,space:"eden"});
+        	allocateG1({target:"minor-gc-g1-03",useTimer:false,space:"survivor"});
+    	}
+    	
+    	if( _exceptTargets["full-gc-g1"]){
+    	}else{
+    		$("#full-gc-g1 .cheap").remove();
+    		var clonedInitHeap = $("#initial-heap .cheap").clone();
+    		$(clonedInitHeap).find(".space .object").removeClass("old eden survivor").addClass("empty");
+        	$("#full-gc-g1 .figure").append($(clonedInitHeap));
+        	allocateG1({target:"full-gc-g1",useTimer:false,space:"old",density:3});
+        	allocateG1({target:"full-gc-g1",useTimer:false,space:"eden",density:5});
+        	allocateG1({target:"full-gc-g1",useTimer:false,space:"survivor",density:5});
+    	}
     };
     
     </script>
