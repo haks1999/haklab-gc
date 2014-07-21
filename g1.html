@@ -164,9 +164,7 @@
 							</div>
                 			<h3>The Layout of the heap</h3>
 							<ul>
-								<li><strong>The eden</strong> This is where most new objects are allocated (not all, as large objects may be allocated directly into the old generation). The eden is almost always empty after a minor garbage collection. </li>
-								<li><strong>The two survivor spaces (S1, S2)</strong> These hold objects that have survived at least one minor garbage collection.</li>
-								<li><strong>The Old generation</strong> Objects that are longer-lived are eventually promoted, or tenured, to the old generation.</li>
+								<li>The heap is partitioned into a set of equal-sized heap regions, each a contiguous range of virtual memory. Certain region sets are assigned the same roles (eden, survivor, old) as in the older collectors, but there is not a fixed size for them. This provides greater flexibility in memory usage.</li>
 							</ul>
 							<div class="well well-sm">
       							The Application is not running.
@@ -194,8 +192,7 @@
                 			<h3>Eden Allocation
 							</h3>
 							<ul>
-								<li>Allocations into the eden by using what’s referred to as "the bump-the-pointer technique"</li>
-								<li>The end of the last allocated object is tracked, and when a new allocation request needs to be satisfied, the allocator needs only to check whether it will fit between top and the end of the eden. If it does, top is bumped to the end of the newly allocated object</li>
+								<li>Allocations into the eden just like other GCs</li>
 							</ul>
 							<div class="well well-sm">
       							The Application is running.
@@ -222,11 +219,9 @@
 							</div>
                 			<h3>Minor Garbage Collection 01
 							</h3>
-							<ol>
-								<li>Objects that have been found to be garbage are marked with a X.</li>
-								<li>Live objects in the eden that survive the collection are copied to the unused survivor space(S1).</li>
-								<li>Finally the eden is entirely empty</li>
-							</ol>
+							<ul>
+								<li>Live objects are evacuated (copied/moved) to one or more survivor regions. It’s done in parallel with multiple threads to shorten the pause time. Eden size and survivor size is calculated for the next young GC. Pause time goal are taken into consideration. This approach makes it very easy to resize regions, making them bigger or smaller as needed.</li>
+							</ul>
 							<div class="well well-sm">
       							The Application is stopped for garbage collection.
     						</div>
@@ -251,13 +246,9 @@
 							</div>
                 			<h3>Minor Garbage Collection 02
 							</h3>
-							<ol>
-								<li>Objects that have been found in Eden and Survivor(S1) to be garbage are marked with a X.</li>
-								<li>Live objects in the eden that survive the collection are copied to the unused survivor space(S2).</li>
-								<li>Live objects in the survivor space that is in use, which will be given another chance to be reclaimed in the young generation, are also copied to the unused survivor space(S2).</li>
-								<li>At the end of the minor garbage collection, the two survivor spaces swap roles.</li>
-								<li>Finally the eden is entirely empty and only one survivor space is in use.</li>
-							</ol>
+							<ul>
+								<li>There are S1(from) and S2(to) survivor spaces in G1 as well as others.</li>
+							</ul>
 							<div class="well well-sm">
       							The Application is stopped for garbage collection.
     						</div>
@@ -284,7 +275,7 @@
                 			<h3>Minor Garbage Collection 03
 							</h3>
 							<ul>
-								<li>Same as before. just for checking swapped survivor spaces.</li>
+								<li>If the aging threshold is met, some of the objects are promoted to old generation regions.</li>
 							</ul>
 							<div class="well well-sm">
       							The Application is stopped for garbage collection.
@@ -320,35 +311,6 @@
 							</ol>
 							<div class="app-state well well-sm">
       							The Application is stopped for [Initial Mark].
-    						</div>
-                			
-                		</div>
-                	</div>
-				</div>
-            </div>
-            
-            <div id="minor-gc-05" class="item">
-            	<div class="container top-buffer">
-                	<div class="row section">
-                		<div class="col-md-1"></div>
-                		<div class="figure col-md-5">
-                		</div>
-                		<div class="col-md-4">
-                			<div class="btn-group btn-group-sm">
-                				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
-								<button type="button" class="btn btn-default" onclick="initializeHeapLayout();minorGC05();">
-  									<span class="glyphicon glyphicon-repeat"></span>
-								</button>
-        						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
-							</div>
-                			<h3>Minor Garbage Collection 05
-							</h3>
-							<ul>
-								<li>In this case, free space is not contiguous (unlike in the Serial or Parallel), and the garbage collector needs to employ a data structure (free lists, in the case of the HotSpot VM) that records which parts of the heap contain free space.</li>
-								<li>So, fragmentation issues due to the lack of compaction might also prevent the garbage collector from using all the available free space as efficiently as possible. If the old generation is full before the collection cycle in progress has actually reclaimed sufficient space, CMS reverts to an expensive stop-the-world compacting phase, similar to that of the Parallel and Serial GCs.</li>
-							</ul>
-							<div class="well well-sm">
-      							The Application is stopped for garbage collection.
     						</div>
                 			
                 		</div>

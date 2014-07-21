@@ -357,7 +357,6 @@ function copyObjectsG1(args){
 	
 	var switchObjFnc = function(targetObj, target, timeout){
 		var _tf = setTimeout(function(){
-			//$(targetObj).switchClass("empty " + target, target,400);//.removeClass("empty " + target).addClass(target);
 			$(targetObj).removeClass("empty " + target).addClass(target);
 		},timeout);
 		timeoutList.push(_tf);
@@ -379,7 +378,6 @@ function copyObjectsG1(args){
 		$(copyingObj).css("position","absolute").css("left",position.left-startingPos.left).css("top", position.top-startingPos.top).appendTo($(".carousel-inner .item.active .cheap"));
 		$(copyingObj).animate({left:targetObjOffset.left-startingPos.left,top:targetObjOffset.top-startingPos.top},CONST.G1.COPY_SPD,function(){
 			switchObjFnc($(targetObj), args.trg, 1);
-			//if( args.src == args.trg ) return;
 			$(this).fadeOut("fast",function(){
 				$(this).remove();
 			});
@@ -491,6 +489,59 @@ function remarkAndRemoveG1(){
 	$(".carousel-inner .item.active .space .object.old:not(.markuse)").each(function(){
 		removeFnc($(this),CONST.G1.MARK_RATE*timerIdx++);
 	});
+	
+	var _tf=setTimeout(function(){
+		copyAndCleanupObjectsG1();
+	},CONST.G1.MARK_RATE*timerIdx++);
+	timeoutList.push(_tf);
+};
+
+function copyAndCleanupObjectsG1(){
+	$("#full-gc-g1 div.app-state").text("The Application is stopped for [Copying/Cleanup]");
+	$(".carousel-inner .item.active .space .object.markuse").removeClass("markuse");
+	
+	var startingPos = getStartingOffset({target:".carousel-inner .item.active .cheap"});
+	
+	var switchObjFnc = function(targetObj, target, timeout){
+		var _tf = setTimeout(function(){
+			$(targetObj).removeClass("empty").addClass(target);
+		},timeout);
+		timeoutList.push(_tf);
+	}
+	
+	var targetObjIdx = -1;
+	var cleanupCompact = 10;
+	$(".carousel-inner .item.active .space .object.old").each(function(){
+		if( getRandomInt(1,10) > 6 ){
+			return;
+		}
+		if( cleanupCompact > 4 ){
+			targetObjIdx = getRandomInt(1,$(".carousel-inner .item.active .space .object.empty").length-1);
+			cleanupCompact = 0;
+		}
+		cleanupCompact++;
+		
+		var targetObj = $(".carousel-inner .item.active .space .object.empty:eq(" + targetObjIdx + ")");
+		
+		if( $(this).hasClass("empty")) return;
+		
+		var targetObjOffset = $(targetObj).offset();
+		
+		var position = $(this).offset();
+		var copyingObj = $(this).clone();
+		
+		$(this).addClass("empty").removeClass("old");
+		$(copyingObj).css("position","absolute").css("left",position.left-startingPos.left).css("top", position.top-startingPos.top).addClass("old").appendTo($(".carousel-inner .item.active .cheap"));
+		$(copyingObj).animate({left:targetObjOffset.left-startingPos.left,top:targetObjOffset.top-startingPos.top},CONST.G1.COPY_SPD,function(){
+			switchObjFnc($(targetObj), "old", 1);
+			$(this).fadeOut("fast",function(){
+				$(this).remove();
+			});
+		});    		
+	});
+	
+	copyObjectsG1({src:"survivor",trg:"old"});
+	copyObjectsG1({src:"eden",trg:"survivor"});
 };
 
 function getStartingOffset(args){
